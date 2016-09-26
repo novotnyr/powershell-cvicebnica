@@ -1,0 +1,470 @@
+---
+title: Cvičebnica z Powershellu, časť 1
+layout: page
+---
+
+Inštalácia
+=========
+
+**PowerShell 2.0** je automaticky dostupný vo Windows 7 a Windows 2008 R2. Pre staršie verzie Windowsu navštívte [http://support.microsoft.com/kb/968929](http://support.microsoft.com/kb/968929) a stiahnite *Windows Management Framework Core (WinRM 2.0 and Windows PowerShell 2.0)*.
+
+Od septembra 2012 je k dispozícii **PowerShell 3.0** pre Windows 7 Service Pack 1, Windows Server 2008 R2 SP1, Windows Server 2008 Service Pack 2. 
+
+V tomto tutoriále sa však stále budeme venovať verzii 2.0.
+
+Úvodné úlohy
+=============
+
+Spustite PowerShell
+-------------------
+
+	Start | powershell.exe
+
+Vyskúšajte vlastnosti kalkulačky, zrátajte (2 + 3) * 10.
+-------------
+	(2 + 3) * 10
+
+Zistite, akú verziu PowerShellu používate.
+------------------------------------------
+
+	Get-Host
+
+Príkazy nerozlišujú veľké a malé písmena.
+
+<div markdown="1" class="alternative-solution">
+Podobnú informáciu obsahuje aj premenná `$PSVersionTable`.
+</div>
+
+Spustite Powershell 2.0
+-----------------------
+Na moderných Windowsoch sa automaticky spúšťa najnovší Powershell. Na zachovanie spätnej kompatibility môžete explicitne spustiť konkrétnu verziu.
+
+	powershell -version 2.0
+
+Overte následne spustenú verziu.
+
+Spustite Prieskumníka
+---------------------
+
+	explorer
+
+alebo
+
+	explorer.exe
+
+Možno spúšťať bežné programy, ktoré sú dostupné v systéme.
+
+Zistite, v ktorom adresári sa práve nachádzate.
+-----------
+Zistiť to môžeme pohľadom na výzvu (prompt).
+
+	PS C:\Users\rn>
+
+Zistite, v ktorom adresári sa práve nachádzate pomocou `pwd`.
+-------------------------
+
+	pwd
+
+Zobrazte súbory a adresáre v aktuálnom podadresári pomocou `ls`.
+------------------------
+	
+	ls
+
+Zobrazte súbory a adresáre v aktuálnom podadresári pomocou `dir`.
+------------------------
+
+	dir
+
+Zobrazte súbory a adresáre v aktuálnom podadresári pomocou `Get-ChildItem`.
+------------------------
+
+	Get-ChildItem
+
+Zistite všetky alternatívne názvy pre výpis súborov a adresárov
+-------------------
+
+	alias dir
+
+alebo
+
+	alias ls
+
+PowerShell neraz definuje pre jeden príkaz viacero alternatívnych názvov. Zabudovaný príklad PowerShellu sa nazýva **cmdlet** (commandlet): príkladom je `Get-ChildItem`, ktorý má aliasy `dir` aj `ls`.
+
+Preštudujte dokumentáciu k `ls` / `dir` / `Get-ChildItem`
+------------------------
+	
+	man ls
+
+alebo
+
+	man dir
+
+alebo 
+
+	man Get-ChildItem
+
+alebo 
+
+	help Get-ChildItem
+
+Skúste tiež
+
+	man man
+
+Príklady môžete získať cez:
+
+	man ls -examples
+
+Zobrazte len názvy súborov či adresárov v aktuálnom adresári.
+------------------------------------------------------------
+
+	ls –Name
+
+Názvy parametrov možno skrátiť, pokiaľ nedôjde k nejednoznačnostiam.
+	
+	ls -n
+
+Zapíšte názvy súborov a adresárov do externého súboru.
+--------------
+
+	ls -n > subory.txt
+
+Výstup ľubovoľného cmdletu možno zapísať do textového súboru použitím presmerovania cez `>`.
+
+Overte existenciu súboru `subory.txt`
+--------------
+
+	ls subory.txt
+
+Alternatívne pomocou cmdletu `Get-Item`˛
+
+	Get-Item subory.txt
+
+Alternatívne pomocou cmdletu `gi`, aliasu pre `Get-Item`
+
+	gi subory.txt
+
+Otvorte `subory.txt` v textovom editore
+---------------
+
+	notepad subory.txt
+
+Pohyb v prostredí
+------------------
+* Šípky hore a šípky dole sa pohybujú po histórii príkazov
+* Tabulátor realizuje automatické dopĺňanie.
+* Kliknutím myši a ťahaním môžete vybrať text a pravým klikom ho skopírovať do schránky.
+* cmdlet `cls` / `Clear-Host` zmaže obrazovku.
+
+
+Adresáre
+=========
+
+Vypíšte obsah vlastného domovského adresára.
+----------
+Ak ste v domovskom adresári, tak:
+
+	ls
+
+Presun do domovského adresára:
+	
+	cd ~
+
+A následne:
+	
+	ls
+
+Alternatívne z ľubovoľného adresára
+	
+	ls ~
+
+Vlnka `~` je skratka pre cestu do domovského adresára.
+
+Vypíšte všetky súbory a adresáre v `C:/Users`
+------
+
+	ls C:/Users
+
+Vypíšte všetky súbory a adresáre v `C:/Users`, ktoré sa začínajú na „P“.
+
+Možnosť 1:
+
+	cd C:\Users
+	ls P*
+
+Možnosť 2:
+
+	ls C:\Users\P*
+
+Vypíšte všetky súbory typu XML v domovskom adresári.
+----------
+
+	ls ~ *.xml
+
+Alebo (ak sme v domovskom adresári):
+
+	ls *.xml
+
+Vypíšte všetky súbory v domovskom adresári a vo všetkých jeho podadresároch.
+---------------------------------
+
+	ls –Recurse
+
+alebo
+	
+	ls -r
+
+Vypíšte všetky XML súbory v domovskom adresári a vo všetkých jeho podadresároch.
+------------------------------------------
+Pozor! Pokus o 
+
+	ls *.xml –r
+
+nepovedie k výsledku! Prvým nepomenovaným argumentom musí byť aktuálny adresár, druhým je filter. Korektný príkaz je 
+
+	ls ~ *.xml -r
+
+čo je skrátenina pre
+
+	ls -Path . -Filter *.xml -Recurse 
+
+Ak sa nachádzame v domovskom adresári, potom:
+
+	ls . *.xml –r
+
+(Prvý parameter je bodka, druhý filter)
+
+
+Vypíšte len plochý zoznam súborov z predošlej úlohy
+----------------
+	
+	ls ~ *.xml -Recurse -Name
+
+Spočítajte, koľko je súborov z predošlej úlohy
+-----
+Vystavajme rúru a výsledok z `ls` pošlime do cmdletu `measure`, ktorý vie robiť štatistické výpočty
+
+	ls ~ *.xml -Recurse | measure
+
+Vo výslednej položke `Count` nájdeme výsledok.
+
+Cmdlet `measure` je aliasom pre `Measure-Object`.
+
+Spočítajte, koľko miesta zaberajú všetky súbory v domovskom adresári
+---------------------------
+Cmdlet `measure` má parameter `–Sum`, ktorý popri počte položiek vie rátať aj sumy veľkostí. Musíme však určiť, podľa ktorého atribútu sa má sčítavať. Dosiahneme to pomocou prepínača `–Property`.
+
+	ls ~ -Recurse -Force | measure –Property Length -Sum
+
+Každý súbor má atribút `Length` udávajúci jeho veľkosť (adresáre ju majú prázdnu).
+
+Pozn. pre hnidopichov: neberú sa do úvahy skryté súbory a softlinky sa vyhodnotia nesprávne.
+
+Vypíšte len adresáre v domovskom adresári
+------------------------------
+
+	ls | where {$_.PSIsContainer}
+
+cmdlet `Where` slúži na filtrovanie. V kučeravých zátvorkách sa nachádza výraz (_expression_) s booleovskou podmienkou. 
+
+Cmdlet `ls` produkuje zoznam objektov. Cmdlet `where` vyhodnotí každý prvok tohto zoznamu, dosadí ho do špeciálnej premennej `$_` a v prípade, že je podmienka splnená, zahrnie ho do výstupného zoznamu. 
+
+Atribút `PSIsContainer` je pravdivý pre adresáre, pre súbory nie.
+
+Cmdlet `where` je aliasom pre `Where-Object`. 
+
+Alternatívny alias je `?`
+
+	ls | ? { $_.PSIsContainer }
+
+Zistite, koľko súborov sa nachádza v domovskom adresári a jeho podadresároch.
+---------------------------------------
+	
+	ls -r | where {-not $_.PSIsContainer} | measure
+
+`-not` je negácia podmienky.
+
+Alternatívne možno použiť výkričník
+
+	ls -r | where {!$_.PSIsContainer} | measure
+
+Alternatívne:
+	
+	ls -r | where {$_.PSIsContainer -eq $False} | measure
+
+Vypíšte súbory a adresáre v domovskom adresári zotriedené podľa mena
+------------------------------
+
+	ls | sort
+
+Tento príkaz robí to isté, čo prostý `ls`, pretože súbory na výstupe sú už štandardne zotriedené podľa mena.
+
+Cmdlet `sort` je alias pre `Sort-Object`.
+
+Vypíšte len súbory zotriedené podľa veľkosti
+--------
+
+	ls | where {-not $_.PSIsContainer} | sort Length
+
+Cmdlet `sort` má parameter, v ktorom určíme atribút, podľa ktorého sa má triediť. Triedime podľa veľkosti (`length`).
+
+Alternatívne:
+
+	ls | where {-not $_.PSIsContainer} | sort –Property Length
+
+Vypíšte súbory a adresáre zotriedené podľa veľkosti zostupne.
+-----------------------------------
+
+	ls | sort length –Descending
+
+Prepínač možno skrátiť na 
+
+	ls | sort length –desc
+
+Ak sa parameter skráti na `–d`, nastane chyba nejednoznačnosti názvu parametra (pri sorte existujú dva: `-debug` a `–descending`)
+
+Nájdite najväčší súbor v domovskom adresári (nevnárajte sa do podadresárov)
+---------------------------------------------
+
+	ls | sort Length -Desc | select -first 1
+
+Cmdlet `select` obvykle filtruje objekty podľa atribútov, ale umožňuje filtrovať prvých/posledných _n_ záznamov. V skutočnosti je to alias pre `Select-Object`.
+
+Vypíšte plné cesty k všetkým súborom a adresárom v aktuálnom adresári
+---------------
+
+	ls | select FullName
+
+Nájdite plnú cestu a veľkosť najväčšieho súboru v domovskom adresári vrátane podadresárov.
+--------------------
+
+	ls -r | sort length -desc | select FullName, Length -first 1
+
+cmdlet `select` umožňuje špecifikovať atribúty, ktoré sa objavia na výstupe. V tomto prípade vyberáme plnú cestu (`FullName`) a dĺžku (`Length`).
+
+Nájdite plné cesty k všetkým súborom väčším než 20 MB.
+-------------------------------
+
+	ls -r | where {$_.length -ge 20MB} | select FullName
+
+Pozor! Porovnanie sa realizuje pomocou `–ge`. Znak `>` znamená presmerovanie a jeho použitie v porovnávaní povedie k chybe, resp. k presmerovaní do súboru s obskúrnym názvom.
+
+Vypíšte súbory a adresáre určené len na čítanie.
+----------------------------
+Jeden spôsob využíva atribút `Mode`.
+
+	ls | where {$_.Mode -match "r"}
+
+Operátor `–match` využíva regulárne výrazy. Tu stačí povedať, že hľadá prítomnosť podreťazca v reťazci. Ak mode obsahuje v hodnote „r“, súbor je read-only.
+
+Alternatívne:
+
+	ls | where {$_.mode -like "*r*"}
+
+Operátor `–like` funguje podobne ako v databázach, pričom vieme vyhľadávať s použitím žolíkov. 
+
+Alternatívna, ale mylná možnosť je využiť vlastnosť `isReadOnly`; tá však funguje len na súboroch.
+
+
+Formátovače
+===========
+
+Vypíšte názov a plnú cestu k súboru v užšom formáte
+---------------------------------------------------
+
+	ls | select Name, FullName | Format-Table -AutoSize
+
+alebo
+
+	ls | select Name, FullName | ft -a
+
+Na konci každej rúry je formátovač, ktorý zapíše objekty v primeranom tvare na konzolu. Ak neuvedieme žiaden formátovač, použije sa zväčša tabuľkový formátovač `Format-Table`.
+
+Parametrom `-AutoSize` nastavíme automatické šírky stĺpcov podľa najširšej položky.
+
+Porovnajte tiež ďalšie formátovače:
+
+*	`Format-Wide` / `fw`: na šírku
+*	`Format-List` / `fl`: do zoznamu pod seba.
+
+
+Procesy
+========
+
+Vypíšte zoznam všetkých bežiacich procesov.
+-------------------------
+
+	ps
+
+Vypíšte počet bežiacich inštancií `svchost`u.
+-------------------------
+
+	ps svchost | measure
+
+Vypíšte zoznam atribútov, na ktoré sa môžete dopytovať pri procese
+-------------------------
+
+	ps | gm
+
+Vypíšte zoznam procesov a ku každému procesu vypíšte cestu k spúšťaciemu súboru.
+-------------------------
+
+	ps | select Name, Path 
+
+Alternatívne možno použiť cmdlet `Format-Table` (`ft`), kde možno prispôsobiť šírku stĺpcov
+
+	ps | ft Name, Path –a
+
+Zistite, koľkokrát beží proces spustený súborom `C:\Windows\system32\notepad.exe`
+-------------------------
+
+	ps | where {$_.Path -eq "C:\Windows\system32\notepad.exe" } | measure
+
+Vypíšte mená a cesty procesov, ktoré boli spustené z C:\Program Files
+-------------------------
+
+	ps | where {$_.Path -match "C:\\Program Files" } | ft Name, Path
+
+Potrebné je zdvojenie lomiek (\\), pretože lomka má v regulárnych výrazoch špeciálny význam. Regulárne výrazy preberieme neskôr.
+
+Vypíšte procesy a ich vyťaženie CPU v zostupnom usporiadaní.
+-------------------------
+
+	ps | sort -Descending CPU | ft Name, CPU –a
+
+Samozrejme, parameter `–Descending` možno skrátiť:
+
+	ps | sort -desc cpu | ft name, cpu –a
+
+Vypíšte jedno meno procesu, ktoré najviac vyťažuje procesor.
+-------------------------
+	
+	ps | sort -desc cpu | select -first 1 | ft name, cpu -a
+
+Spustite novú inštanciu Skicára.
+-------------------------
+Klasická možnosť
+
+	mspaint
+
+Alternatívne
+
+	start mspaint
+
+Cmdlet `start` je alias pre `Start-Process`
+
+	Start-Process mspaint
+
+Ukončite všetky bežiace inštancie Skicára
+------------------------------------------
+
+	ps mspaint | kill
+
+*	Na rozdiel od linuxového variantu nemusíme naháňať PIDy (ID procesu), ale môžeme do rúry poslať inštancie objektov, ktoré následne `kill` zabije.
+*	`kill` je alias pre `Stop-Process`
+
+Ukončite ešte raz všetky bežiace inštancie Skicára a pozorujte chybovú hlášku.
+----------------------------------------
+
+	Get-Process mspaint | Stop-Process

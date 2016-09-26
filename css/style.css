@@ -1,0 +1,26 @@
+body {
+	font-family: 'Source Sans Pro', sans-serif;
+}
+
+.post {
+    margin: auto;
+    width: 50%;
+    padding: 12pt;
+}
+
+.highlighter-rouge pre {
+	margin-left: 12pt;
+	padding: 12pt;
+	background: rgb(0, 36, 82);
+	color: white;
+}
+
+.post-title {
+	font-size: 2em;
+}
+
+.alternative-solution {
+	margin-left: 12pt;
+	padding: 12pt;
+	background: cyan;
+}
