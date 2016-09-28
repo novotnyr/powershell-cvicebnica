@@ -22,6 +22,7 @@ Spustite PowerShell
 
 Vyskúšajte vlastnosti kalkulačky, zrátajte (2 + 3) * 10.
 -------------
+
 	(2 + 3) * 10
 
 Zistite, akú verziu PowerShellu používate.
@@ -468,3 +469,860 @@ Ukončite ešte raz všetky bežiace inštancie Skicára a pozorujte chybovú hl
 ----------------------------------------
 
 	Get-Process mspaint | Stop-Process
+
+---
+title: Cvičebnica z Powershellu, časť 2
+layout: page
+---
+
+Služby
+=======
+Vypíšte zoznam všetkých služieb vo Windowse.
+--------------------------------------------
+
+	Get-Service
+
+alternatívne
+
+	gsv
+
+Vypíšte zoznam všetkých bežiacich služieb.
+-------------------------------------------
+
+	gsv | where {$_.Status -eq "Running"}
+
+Zastavte službu s názvom Themes.
+-------------------------------------------
+	Stop-Service Themes
+
+alebo dlhšie, ale v súlade s filozofiou `ps`/`kill`:
+
+	Get-Service Themes | Stop-Service
+
+Znovu spustite službu s názvom Themes.
+-------------------------------------------
+	Start-Service Themes
+
+alebo dlhšie, ale v súlade s filozofiou `ps`/`kill`:
+
+	Get-Service Themes | Start-Service
+
+Zistite, aké atribúty má objekt pre službu
+-------------------------------------------
+
+	Get-Service | Get-Member
+
+alebo
+
+	gsv | gm
+
+Vypíšte služby spolu so závislými službami.
+-------------------------------------------
+
+	Get-Service | ft Name, ServicesDependedOn –a
+
+
+Vypíšte služby, ktoré nezávisia na žiadnej službe.
+-------------------------------------------
+
+	gsv | where {$_.ServicesDependedOn} | select name
+
+Atribút `ServicesDependedOn` je zoznamom. Hoci podmienka vo `Where` očakáva booleovský výraz, v prípade zoznamov platí, že podmienka je splnená vtedy, ak je zoznam neprázdny.
+
+Zistite, ktoré služby závisia na službe HTTP
+-------------------------------------------
+
+	gsv HTTP -DependentServices
+
+Pre každú službu vypíšte služby, na ktorých táto služba závisí
+-------------------------------------------
+
+	gsv | select displayname, dependentservices | sort displayname
+
+.NET Framework
+===============
+Vypočítajte druhú odmocninu z 25
+-------------------------------------------
+
+	[Math]::Sqrt(25)
+
+Použime statickú metódu `Sqrt()` na objekte `System.Math`.
+
+Zahrajte štandardný zvuk Pípania vo Windowse
+-------------------------------------------
+	
+	[Media.SystemSounds]::Beep.Play()
+
+Stačí zavolať statickú inštančnú premennú `Beep` na triede `System.Media.SystemSounds`. (Namespace `System` je automaticky importnutý.) 
+
+Premenná `Beep` je typu `System.Media.SystemSound` (ľahko overíme pomocou cmdletu `Get-Member`):
+
+	[Media.SystemSounds]::Asterisk | Get-Member
+
+Na `SystemSound`-e môžeme zavolať metódu `Play()`
+
+WMI (Windows Management Instrumentation)
+=========================================
+Zistite veľkosť RAMky v počítači
+--------------------------------
+
+	Get-WmiObject Win32_ComputerSystem
+
+Z vlastnosti `TotalPhysicalMemory` vidíme výsledok. Ak chceme len konkrétne číslo:
+
+	(Get-WmiObject Win32_ComputerSystem).TotalPhysicalMemory
+
+WMI objekt sa tvári ako štandardný powershellovský objekt: má inštančné premenné a metódy.
+
+Voliteľne môžeme zistiť aj gigabajty:
+
+	(Get-WmiObject Win32_ComputerSystem).TotalPhysicalMemory / 1GB
+
+Výsledok bude:
+
+	7,88347625732422
+
+Zistite, koľko modulov RAM je v stroji
+--------------------------------------
+
+	gwmi Win32_PhysicalMemory | ft -a BankLabel, Capacity
+
+Výsledok:
+
+	BankLabel   Capacity
+	---------   --------
+	BANK 0    4294967296
+	BANK 2    4294967296
+
+Máme teda 2 moduly po 4GB.
+
+Zistite zoznam všetkých fyzických diskov pripojených k počítaču
+-------------------------------------------
+	
+	Get-WmiObject Win32_DiskDrive
+
+`Win32_DiskDrive` je trieda zodpovedajúca fyzickému disku vo Windowse.
+
+Zistite zoznam všetkých vlastností / metód, ktoré možno zistiť o fyzických diskoch.
+-------------------------------------------
+
+	Get-WmiObject Win32_DiskDrive | Get-Member
+
+Zistite zoznam fyzických diskov, ktoré podporujú technológiu SMART
+-------------------------------------------
+
+	Get-WmiObject Win32_DiskDrive | where {$_.Capabilities -contains 10} | ft Caption
+
+Technológia SMART (Self-Monitoring, Analysis, and Reporting Technology) umožňuje monitorovanie a varovanie pred zlyhaním disku. Podporuje ju takmer každý dostupný pevný disk.
+
+Trieda [`Win32_DiskDrive`](http://msdn.microsoft.com/en-us/library/aa394132%28v=VS.85%29.aspx#properties) obsahuje vlastnosť `Capabilities` reprezentovanú poľom integerov. Ak pole obsahuje hodnotu 10, zariadenie podporuje SMART.
+
+Nájdite fyzický disk s najväčšou kapacitou.
+-------------------------------------------
+
+	Get-WmiObject Win32_DiskDrive | sort size -desc | select -first 1
+
+Dôležitá vlastnosť je `Size`.
+
+Vypíšte zoznam všetkých logických jednotiek dostupných v systéme
+----------------------------------------------------------------
+
+	gwmi Win32_LogicalDisk | where {$_.DriveType -eq 3}
+
+Dokumentácia (http://msdn.microsoft.com/en-us/library/aa394173(VS.85).aspx) udáva 3 ako konštantu pre lokálnych jednotku.
+
+Vypíšte zoznam všetkých MP3jek na všetkých lokálnych jednotkách
+---------------------------------------------------------------
+
+	gwmi Win32_LogicalDisk 
+	| ? {$_.DriveType -eq 3} 
+	| % {dir $_.Caption -Recurse } 
+	| ? {$_ -like "*.mp3"} 
+	| ft name
+
+
+Vypíšte zoznam všetkých tlačiarní pripojených k počítaču
+-------------------------------------------
+
+	Get-WmiObject Win32_Printer
+
+Vypíšte názov implicitnej tlačiarne
+-------------------------------------------
+
+	Get-WmiObject Win32_Printer | where {$_.Default} | ft Name
+
+Zistite zoznam všetkého nainštalovaného softvéru od Adobe
+-------------------------------------------
+	
+	Get-WmiObject Win32_Product | where {$_.Caption -match "Adobe"} | sort Caption | ft Caption
+
+Na niektorých inštaláciách Windows XP sa stretnete s chybou.
+
+Zistite zoznam bežiacich procesov cez WMI
+-----------------------------------------
+
+	Get-WmiObject Win32_Process | ft -a ProcessId, Name, ExecutablePath
+
+Alternatívne cez dopyty v jazyku WQL ([WMI Query Language](http://msdn.microsoft.com/en-us/library/aa392902(v=vs.85).aspx)):
+
+	Get-WmiObject -Query 'select Name from Win32_Process'
+
+WQL je podobný jazyku SQL. Názov triedy zodpovedá tabuľke, inštačné premenné stĺpcom.
+
+Zistite zoznam bežiacich procesov z `C:\Windows`
+------------------------------------------------
+
+	Get-WmiObject -Query 'select Name from Win32_Process where ExecutablePath like "%C:\\Windows%"'
+
+Alternatívne cez pretypovanie reťazca na objekt typu `wmisearcher`:
+
+	$q = [wmisearcher] 'select Name from Win32_Process where ExecutablePath like "%C:\\Windows%"'
+	$q.get()
+
+Zistite info o procese s ID 0
+------------------------------
+
+	gwmi -query 'select * from Win32_Process where Handle=0'
+
+alebo 
+
+	gwmi Win32_Process -filter "Handle=0"
+
+alebo pretypovaním reťazca na objekt typu `[wmi]`:
+
+	[wmi] 'Win32_Process.Handle=0'
+
+Pozor, táto posledná finta funguje len pre niektoré vlastnosti. Z dokumentácie pre konkrétnu triedu zistite, ktoré vlastnosti majú kvalifikátor (*qualifier*) **Key**. Napríklad [`Win32_Process`]((http://msdn.microsoft.com/en-us/library/aa394372%28v=vs.85%29.aspx)) má len vlastnosti `CreationClassName` a `Handle`. Podrobnejšie vysvetlenie je na [MSDN Blogu](http://blogs.msdn.com/b/powershell/archive/2008/04/15/wmi-object-identifiers-and-keys.aspx).
+
+Reštartujte počítač
+-------------------------------------------
+	
+	(Get-WmiObject Win32_OperatingSystem).Reboot()
+
+`Get-WmiObject` pošle do rúry jeden objekt, na ktorom môžeme volať metódy z dokumentácie.
+
+Alternatívne cmdletom:
+	
+	Restart-Computer
+
+Providery
+=========
+Zistite všetkých providerov v systéme
+-------------------------------------
+
+	Get-PSDrive
+
+Alebo:
+
+	gdr
+
+Vypíšte zoznam všetkých diskových jednotiek
+--------------------------------------------
+
+	Get-PSDrive | Where {$_.Provider -match "FileSystem"} | Select Root
+
+alebo
+
+	gdr | ? {$_.Provider -match "FileSystem"} | Select Root
+
+Problém v tomto prípade spočíva v tom, že sú zahrnuté aj vymeniteľné jednotky (DVD mechaniky), v ktorých sa nemusí nachádzať disk a teda prípadný výpis ich obsahu zlyhá.
+
+Vypíšte mená všetkých nainštalovaných fontov
+---------------------------------------------
+
+	(Get-Item "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts").Property | sort
+
+Využijeme providera pre registre. "Jednotka" `HKLM:` zodpovedá registru `HKEY_LOCAL_MACHINE`, nastaveniam súvisiacim s celým systémom. 
+
+Alternatívne s použitím.NET:
+
+	[System.Reflection.Assembly]::LoadWithPartialName("System.Drawing")
+	$installedFonts = New-Object System.Drawing.Text.InstalledFontCollection
+	$installedFonts.Families | % {$_.Name}
+
+Vypíšte zoznam všetkých vyhľadávacích strojov v Internet Exploreri a URL adries, ktorými sa vyhľadáva
+------------------------------------------------------------------------------------------------------
+	
+	dir "HKCU:\Software\Microsoft\Internet Explorer\SearchScopes" | % {$_.GetValue("DisplayName") + ": " + $_.GetValue("URL") }
+
+Opäť využijeme providera pre registre. "Jednotka" `HKCU:` zodpovedá registru `HKEY_CURRENT_USER`, nastaveniam špecifickým pre konkrétneho používateľa. 
+
+Registre vracajú položku `RegistryKey`, čo je kvázi-mapa z kľúčov do hodnôt. Metódou `GetValue()` vieme získať hodnotu na základe daného kľúča.
+
+Zistite, či je nastavená systémová premenná `JAVA_HOME`
+------------------------------------------------------
+
+	dir Env:\JAVA_HOME | select value
+
+Provider `Env:` slúži na premenné prostredia.
+
+Alternatívne cez registre:
+
+	(gi "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Environment").GetValue("JAVA_HOME")
+
+
+Nastavte `JAVA_HOME` pre všetkých používateľov na `C:\java\jdk6`.
+----------------------------------------------------------------
+ 
+	(gi "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Environment").SetValue("JAVA_HOME", "C:\Java\JDK")
+
+
+Vytvorte v domovskom adresári súbor `ahoj.txt` s obsahom `AHOJ`
+---------------------------------------------------------------
+
+	echo "Ahoj" > ahoj.txt
+
+Toto je klasická finta známa ešte z čias MS-DOSu (a fungujúca aj na Linuxe).
+
+Alternatívne: pošlime do rúry reťazec a cez `Set-Content` ho uložme do súboru. 
+
+	"AHOJ" | Set-Content ahoj.txt
+
+Alternatívne:
+
+	"AHOJ" | sc ahoj.txt
+
+Overte existenciu súboru `ahoj.txt`
+-----------------------------------
+
+	cat ahoj.txt
+
+Toto je klasická linuxovina. V skutočnosti je `cat` alias pre `Get-Content` (`gc`):
+
+	Get-Content ahoj.txt 
+
+Vytvorte v domovskom adresári zoznam desiatich súborov tyzden1.txt ... tyzden10.txt
+-----------------------------------------------------------
+	1..10 | % {"" | set-content tyzden$_.txt}
+
+Zistite adresár, v ktorom sa nachádzajú položky Plochy.
+-----------------------------------------------------------
+Informáciu možno získať z registrov z položky `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders`, v kľúči `Desktop`. 
+
+Overte, že sa naozaj v registroch nachádza. Položka je typu expandovateľný reťazec a premenná `%USERPROFILE%` sa automaticky expanduje na správnu hodnotu podľa aktuálne prihláseného používateľa.
+
+	(gi 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders').GetValue("Desktop")
+
+Vytvorte na ploche súbor poznamky.txt
+-----------------------------------------------------------
+
+	$DesktopDir = (gi 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders').GetValue("Desktop")
+	"" | sc $DesktopDir\poznamky.txt
+
+Stiahnite z PowerShellu súbor http://ics.upjs.sk/~novotnyr/home/skola/systemove_programovanie/mena.txt
+-----------------------------------------------------------
+
+	(New-Object System.Net.WebClient).DownloadString("http://ics.upjs.sk/~novotnyr/home/skola/systemove_programovanie/mena.txt") | Set-Content mena.txt
+
+V textovom editore vytvorte súbor mena.txt s nasledovným obsahom:
+-----------------------------------------------------------
+
+	Jozef Košický,študent,Hlavná 25,Košice
+	Milan Košický,študent,Leninova 66,Košice
+	Zuzana Mikulášska,zamestnankyňa,Poľná 25, Liptovský Mikuláš
+	Júlia Spišskohôrna,študentka,Alana Turinga 25, Spišská Hôrna
+	Jeremiáš Prešovský,školník,Industriálna 15, Prešov
+
+Vypíšte obsah súboru `mena.txt`
+-------------------------------
+
+	Get-Content mena.txt
+
+Alternatívne:
+
+	gc mena.txt
+
+Vypíšte len riadky, ktoré obsahujú študentov
+-----------------------------------------------------------
+	
+	Get-Content mena.txt | where {$_ -like "*študent*"}
+
+Alternatívne:
+
+	gc mena.txt | ? {$_ -like "*študent*"}
+
+Alternatívne:
+
+	gc mena.txt | ? {$_ -match "študent"}
+
+Súbor je reprezentovaný ako zoznam reťazcových riadkov, overte to:
+-----------------------------------------------------------
+
+	Get-Content mena.txt | Get-Member
+
+Vypíšte len riadky, ktoré obsahujú študentov začínajúcich sa na „J“
+-----------------------------------------------------------
+
+	Get-Content mena.txt | where {$_ -like "J*"}
+
+Vypíšte len riadky, ktoré sa začínajú sa na „J“ a reprezentujú len zamestnancov
+-----------------------------------------------------------
+
+	Get-Content mena.txt | where {($_ -like "J*") -and ($_ -notlike "*zamestnanec*")}
+
+Vypíšte jednotlivé slová z gramatickej vety zadanej na vstupe
+-----------------------------------------------------------
+
+	"Byť, či nebyť, to je otázka".split()
+
+Metóda `split()` rozdelí text podľa oddeľovača, výsledkom je zoznam s jednotlivými oddelenými prvkami.
+
+Alternatívne sa dá použiť operátor –split
+
+	"Ahoj svet" -split " "
+
+Z textu „Ahoj svet“ vypíšte len prvé slovo
+-----------------------------------------------------------
+
+	"Byť, či nebyť, to je otázka".split()[0]
+
+K zoznamu môžeme pristupovať pomocou poľovej notácie.
+
+Alternatívne:
+
+	("Byť, či nebyť, to je otázka" -split " ")[0]
+
+Alternatívne:
+
+	"Byť, či nebyť, to je otázka" -split " " | select -first 1
+
+Vypíšte len mená zo súboru `mena.txt`
+-----------------------------------------------------------
+	get-content mena.txt | % {$_.split(",")[0]}
+
+Metóda `split()` má parameter, kde vieme špecifikovať oddeľovač. (Implicitný oddeľovač je medzera).
+
+Vypíšte mená, ktoré sa končia na „A“
+------------------------------------
+
+	get-content mena.txt | % {$_.split(",")[0]} | ? {$_ -like "*a"}
+
+Alternatívne pomocou regulárnych výrazov:
+
+	get-content mena.txt | ? {$_ -match ".+a,"}
+
+Vypíšte ľudí, ktorých priezvisko sa začína na „K“
+-----------------------------------------------------------
+
+	get-content mena.txt | ? {$_ -match "^(.+) K"}
+
+Vypíšte iniciály mien
+---------------------
+
+	get-content mena.txt | ? {$_ -match "^(.).+? (.).+"} | % {$matches[1] + ". " + $matches[2] + "."}
+
+Nahraďte v súbore `mena.txt` výskyt „študent“ výskytom „poslucháč“
+-----------------------------------------------------------
+Prvý chybný nástrel:
+
+	gc mena.txt | % {$_ -replace "študent", "poslucháč"} | sc mena.txt
+
+Dostaneme hlášku `The process cannot access the file because it is being used by another process`. Namiesto toho uložme výstup do separátneho súboru, originálny súbor zmažme a nový výstup premenujme (toto vyžaduje trojriadkový skript).
+
+Zistite frekvencie jednotlivých slov v súbore
+---------------------------------------------
+
+	gc babel.txt | % { 
+	    $_.split() | % { 
+	        $_.toLower().Trim() -replace "[^a-z]", "" | ? {$_.Length -ge 0 }
+	    }  
+	} | Group-Object | Sort Count
+
+
+*	Vyjdime z cmdletu `Get-Content`, ktorý pošle do rúry jednotlivé riadky súboru. 
+*	Každý riadok rozdelíme na slová cez `Split`: vzniknú tým jednotlivé slová, ktoré preiterujeme v podrúre.
+*	Každé slovo zhodíme na malé písmená, odsekneme začiatočné a koncové medzery a každé nepísmeno nahradíme prázdnym znakom. Zároveň do rúry pošleme len slová, ktorá po upratovaní majú stále nenulovú dĺžku.
+*	Všetky slová zgrupneme cez `Group-Object`, čím získame frekvencie.
+*	Tie už len potriedime podľa počtu a sme hotoví.
+
+PowerShell ISE
+==============
+Zoznámte sa s PowerShell ISE
+----------------------------
+
+Spustite ISE pod právami administrátora
+---------------------------------------
+
+Overte správanie pri otváraní uložených skriptov
+------------------------------------------------
+Otvorenie existujúcich skriptov spôsobí problémy pri spúšťaní.
+
+	File C:\Users\novotnyr\hello.ps1 cannot be loaded because the execution of scripts is  disabled on this system. Please see "get-help about_signing" for more details.
+	At line:0 char:0
+
+Zmeniť možno politiku vykonávania skriptov
+
+	Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
+
+Následne treba odsúhlasiť v GUI zmenu politiky. Táto politika umožní spúšťať všetky skripty, ale tie, ktoré sa stiahli z webu, musia byť digitálne podpísané.
+
+Konštrukcie z procedurálneho programovania
+==========================================
+Oboznámte sa so syntaxou premenných. Vypočítajte cenu s DPH.
+------------------------------------------------------------
+
+	$cena = 1200
+	$dph = 0.21
+	($cena * $dph) + $dph
+
+Premenné v Powershelli sú uvádzané dolármi, podobne ako v PHP, či Perli. 
+
+Overte dátový typ premennej `$cena`
+------------------------------------------------------------
+	
+	$cena | Get-Member
+
+Dátové typy využívajú objektový model z .NET frameworku.
+
+Zistite názvy najčítanejších článkov za posledné 4 hodiny na portáli SME.sk.
+-----------------------------------------------------------
+	$rss = (New-Object System.Net.WebClient).DownloadString("http://rss.sme.sk/rss/rss.asp?id=smenajcit4")
+	$xml = [xml] $rss;
+	$xml.rss.channel.item | % {$_.title}
+
+*	Metódou `DownloadString` stiahneme reťazec.
+*	Pretypujeme ho na XML objekt reprezentovaný typom `[xml]`
+*	po elementoch v strome skáčeme klasickou bodkovou notáciou
+*	dokonca atribúty sa zjavia ako vlastnosti (properties)
+
+Zistite kurz českej koruny z http://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml
+----------------------------
+
+	$currency = "CZK"
+	$xml = [xml] (New-Object System.Net.WebClient).DownloadString("http://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml")
+	$xml.Envelope.Cube.Cube.Cube | ? {$_.currency -eq $currency } | select rate
+
+*	použijeme filozofiu z predošlej úlohy
+*	bonus: atribúty sa zjavia ako vlastnosti (properties)
+*	menné priestory v XML nemusíme vôbec riešiť.
+*	pri porovnávaní pozor na operátor! Používame `-eq`, a nie `==`.
+
+
+Vypíšte 10x text `Budem si robiť domáce úlohy.`
+------------------------------------------------------------
+
+	for ($i = 0; $i -lt 10; $i++) {
+	    echo "Budem si robiť domáce úlohy."
+	}
+
+Cyklus `for` využíva klasickú C/C++/Java/C# syntax. Pozor na
+
+* deklaráciu premenných
+* porovnávanie dvoch hodnôt: namiesto `<` použite `-lt`.
+
+Alternatívne: príkaz `echo` nie je povinný, keďže samotný reťazec predstavuje výraz, ktorý sa pošle do rúry a teda do výstupu.
+
+	for ($i = 0; $i -lt 10; $i++) {
+	    "Budem si robiť domáce úlohy."
+	}
+
+Vypíšte 10x text `Budem si robiť domáce úlohy.`, pričom použite `while
+----------------------------------------------------------------------
+
+	$i = 0
+	while ($i -lt 10) {
+	    "Budem si robiť domáce úlohy."
+	    $i++
+	}
+
+Napíšte ľubovoľný nekonečný cyklus
+----------------------------------------------------------------------
+Zlé riešenie:
+
+	while (true) {
+	    "Budem si robiť domáce úlohy."
+	}
+
+Hláška je
+
+	The term 'true' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+
+Výraz `true` v Powershelli nie je definovaný. 
+
+Alternatívne:
+
+	while (1) {
+	    "Budem si robiť domáce úlohy."
+	}
+
+Každý nenulový výraz sa vyhodnotí na booleovskú hodnotu `pravda`.
+
+Spočítajte frekvencie prípon súborov v adresári
+-----------------------------------------------
+
+	$extensionMap = @{}
+	ls -R D:\MP3 | ? { $_.Mode -notmatch "d" } | % { 
+	    if(! $extensionMap.containsKey($_.Extension)) {
+	        $extensionMap[$_.Extension] = 1
+	    } else {
+	        $extensionMap[$_.Extension]++
+	    }
+	}
+	
+	$extensionMap
+
+*	Využime dátovú štruktúru *hash*; analógiu `HashMap` z iných jazykov.
+*	Prázdny *hash* vytvoríme cez `@{}`, získame objekt typu `System.Collections.Hashtable`
+*	Vieme pristupovať cez `[...]` notáciu.
+*	Existenciu kľúča overíme cez metódu `containsKey()`. 
+
+Spočítajte frekvencie prípon súborov v adresári so zgrupovaním
+---------------------------------------------------------------
+
+	ls -R D:\MP3 | Group-Object Extension | Sort Count | ft Name, Count -a
+
+`Group-Object` dokáže zgrupovať veci do množín podľa rozličných kritérií.
+
+Zotrieďte danú hashtabuľku frekvencií podľa počtu výskytov
+-----------------------------------------------------------
+
+	$frekvencie = @{".m3u" = 3; ".mp3" = 790; ".flac" = 168; ".jpg" = 79}
+	$frekvencie.GetEnumerator() | sort Name
+
+*	hash môžeme vytvoriť aj s hodnotami: uvádzame ich v tvare *kľúč*=*hodnota* a oddeľujeme bodkočiarkou.
+	*	častá chyba je oddeľovať ich čiarkou!
+*	ak chceme triediť hash, musíme získať jeho enumerátor (analógia `Iterator` z Javy), ktorý z každej položky vytvorí separátny objekt a pošle ho do rúry. Klasické `$frekvencie | Sort` nebude fungovať! 
+
+Funkcie
+=======
+
+Vytvorte funkciu `Get-Hello`, ktorá vypíše 10x "Hello World"
+----------------------------------------------------------
+
+	function Get-Hello {
+		1..10 | % { "Hello World" }
+	}
+
+Funkciu zavoláme cez
+
+	Get-Hello
+
+Funkcie sa majú tváriť ako cmdlety a teda by mali dodržiavať konvenciu *sloveso*-*podstatné meno*.
+
+Vytvorte funkciu `Get-Hello`, ktorá vypíše zadaný počet krát "Hello World"
+--------------------------------------------------------------------------
+
+	function Get-Hello($count) {
+		1..$count | % { "Hello World" }
+	}
+	
+	Get-Hello 3
+
+Pri parametroch je často vhodné uviesť implicitnú hodnotu. Ak totiž zavoláme len
+
+	Get-Hello
+
+Uvidíme výpis:
+
+	Hello World
+	Hello World
+
+Funkcia totiž bude iterovať od 1..0, čiže dvakrát. Úprava:
+
+	function Get-Hello($count=1) {
+		1..$count | % { "Hello World" }
+	}
+
+Vytvorte funkciu `Write-RepeatedMessage`, ktorá vypíše zadaný počet krát text
+--------------------------------------------------------------------------
+
+	function Write-RepeatedMessage($message, $count = 1) {
+		1..$count | % { $message }
+	}
+
+Správne volanie:
+
+	Write-RepeatedMessage "Hello World" 2
+
+Zlé volanie, aj keď prirodzené:
+
+	Write-RepeatedMessage("Hello World", 2)
+
+Vypíše totiž:
+
+	Hello World
+	2
+
+Toto nefunguje! Funkcie sa majú tváriť ako cmdlety, preto žiadne zátvorkové volanie nefunguje. Toto nesprávne volanie zavolá funkciu s jedným parametrom typu *dvojprvkové pole*. PowerShell ho vypíše raz a keďže polia sa transformujú na jednotlivé prvky poslané do rúry, uvidíme presne tento výpis. 
+
+Skúste si to napríklad s 
+
+	Write-RepeatedMessage("Hello World", 2, "Ding", "Dong")
+
+Parametre oddeľujeme medzerami!
+
+WTF správanie môžeme vylepšiť dodaním dátových typov
+
+	function Write-RepeatedMessage([string] $message, [int] $count = 1) {
+		1..$count | % { $message }
+	}
+	
+	Write-RepeatedMessage("Hello World", 2)
+
+Toto povedie k výpisu:
+
+	Hello World 2
+
+Vytvorte funkciu, ktorá vypíše čísla *od* hranice *po* hranicu s *krokom*
+-------------------------------------------------------------------------
+
+	function Get-Sequence([int] $from, [int] $to, [int] $step = 1) {
+		for($i = $from; $i -le $to; $i = $i + $step) {
+			$i
+		}
+	}
+
+Volanie:
+
+	Get-Sequence 1 10 3
+
+Aby sme predišli kadejakému WTF, deklarujme dátové typy. Ak máme len hlavičku
+
+	function Get-Sequence($from, $to, $step) {
+
+Môžeme zavolať:
+
+	Get-Sequence "" "Badger Badger Badger Badger Mushroom Mushroom" "Badger "
+
+A máme nekonečný cyklus.
+
+Ak deklarujeme dátové typy, uvidíme hlášku:
+
+	Get-Sequence : Cannot process argument transformation on parameter 'to'. Cannot convert value "Badger Badger Badger Badger Mushroom Mushroom" to type "System.
+	Int32". Error: "Input string was not in a correct format."
+   
+
+
+Vytvorte funkciu `Get-HomeDirectory`, ktorá pre zadaného používateľa vráti jeho domovský adresár
+------------------------------------------------------------------------------------------------
+
+	function Get-HomeDirectory($username) {
+	    $sid = (gwmi win32_useraccount -filter "name = '$username'").sid
+	    (gwmi win32_userprofile -filter "sid = '$sid'").LocalPath
+	}
+
+Volanie:
+
+	Get-HomeDirectory "rn"
+
+Výpis [na Windows 8.1]:
+
+	C:\Users\rn
+
+Využijeme funkcie z WMI. Špecialita je interpolácia reťazcov: ak máme premennú `$username`, a chceme ju použiť vo vnútri reťazca, nemusíme ich lepiť. Dolárové premenné vo vnútri reťazcov sa automaticky nahradia ich hodnotami:
+
+	"name = '$username'"
+
+pre `$username = "rn"` po interpolácii vznikne reťazec `"name = 'rn'"`.
+
+Vytvorte funkciu `Get-HomeDirectory`, ktorá vypíše domovský adresár používateľa z rúry
+--------------------------------------------------------------------------------------
+
+	function Get-HomeDirectory {
+	    foreach($username in $input) {
+	        $sid = (gwmi win32_useraccount -filter "name = '$username'").sid
+	        (gwmi win32_userprofile -filter "sid = '$sid'").LocalPath
+	    }
+	}
+
+Volanie:
+
+	"rn", "UpdatusUser" | Get-HomeDirectory
+
+Každá funkcia má skrytú premennú `$input`, ktorá je kolekcia s prvkami prichádzajúcimi z rúry.
+
+ 
+Vytvorte funkciu, ktorá zistí celkové veľkosti adresárov (rekurzívne)
+---------------------------------------------------------------------
+
+	function Measure-Directory {
+	    foreach($item in $input) {
+	        $size = (dir $item.FullName -Recurse | Measure-Object -Sum -Property Length).Sum
+	        @{$item.FullName = $size}
+	    }
+	}
+
+Volanie:
+
+	ls D:\MP3 | Measure-Directory
+
+Alebo:
+
+	"D:\MP3\Ectasy of Saint Theresa", "D:\MP3\Happy Melon"  | Get-Item | Measure-Directory
+
+Očíslujte položky z rúry
+------------------------
+
+	function Enumerate-Items {
+		$itemIndex = 0;
+		foreach($item in $input) {
+			@{$itemIndex = $item}
+			$itemIndex++
+		}
+	}
+
+Volanie:
+
+	dir | Enumerate-Items
+
+Očíslujte položky z rúry [alternatívna syntax]
+----------------------------------------------
+
+	function Enumerate-Items {
+		begin {
+			$itemIndex = 0;
+		}
+		process {
+			@{$itemIndex = $_}
+			$itemIndex++
+		}
+	}
+
+Funkcia môže pozostávať z troch blokov:
+
+*	`begin`: vykoná sa pred spracovaním prvého objektu z rúry
+*	`end`: vykoná sa po spracovaní posledného objektu z rúry
+*	`process`: vykoná sa pre každý objekt z rúry samostatne. V premennej `$_` sa zjaví aktuálny objekt, ktorý prichádza z rúry.
+
+Vytvorte filter, ktorým spočítate veľkosť adresárov z rúry
+-----------------------------------------------------------
+
+	filter Measure-Directory {
+        $size = (dir $_.FullName -Recurse | Measure-Object -Sum -Property Length).Sum
+        @{$_.FullName = $size}
+	}
+
+Funkcia, ktorá má len blok `process`, sa nazýva *filter*. Riešenie je ekvivalentné 
+
+	function Measure-Directory {
+	    foreach($item in $input) {
+	        $size = (dir $item.FullName -Recurse | Measure-Object -Sum -Property Length).Sum
+	        @{$item.FullName = $size}
+	    }
+	}
+
+a ekvivalentné:
+
+	function Measure-Directory {
+		process {
+        	$size = (dir $_.FullName -Recurse | Measure-Object -Sum -Property Length).Sum
+        	@{$_.FullName = $size}
+		}
+	}
+
+Zistite, ktoré procesy sú systémovo náročné (> 60% CPU)
+-------------------------------------------------------
+
+	filter Get-CpuHeavyProcess {
+	    if($_.PercentProcessorTime -ge 60) {
+	        $obj = New-Object PSObject | Select Name, CPU
+	        $obj.Name = $_.Name;
+	        $obj.CPU = $_.PercentProcessorTime;
+	        $obj
+	    }
+	}
+	gwmi Win32_PerfFormattedData_PerfProc_Process | Get-CpuHeavyProcess
+
+Vyrobíme jednoduchý filter, ktorý sa díva na vlastnosť `PercentProcessorTime`.
+
+Zároveň demonštrujeme dynamické vytváranie objektu.
