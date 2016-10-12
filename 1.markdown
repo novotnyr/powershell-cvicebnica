@@ -1326,3 +1326,14 @@ Zistite, ktoré procesy sú systémovo náročné (> 60% CPU)
 Vyrobíme jednoduchý filter, ktorý sa díva na vlastnosť `PercentProcessorTime`.
 
 Zároveň demonštrujeme dynamické vytváranie objektu.
+
+
+Prílohy
+=======
+
+Verzie Windowsu a verzie Powershellu
+-------------------------------------
+
+Powershell 1.0
+
+
