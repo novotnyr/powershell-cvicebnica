@@ -1,8 +1,8 @@
 @import 'https://fonts.googleapis.com/css?family=Arimo|Source+Code+Pro';
 
 body {
-	font-family: 'Arimo', sans-serif;
-	line-height: 1.5;
+    font-family: 'Arimo', sans-serif;
+    line-height: 1.5;
 }
 
 .post {
@@ -13,28 +13,28 @@ body {
 }
 
 .highlighter-rouge pre {
-	padding: 12pt;
-	background: rgb(0, 36, 82);
-	color: white;
+    padding: 12pt;
+    background: rgb(0, 36, 82);
+    color: white;
 }
 
 .post-title {
-	font-size: 2em;
+    font-size: 2em;
 }
 
 .alternative-solution {
-	padding: 12pt;
-	background: cyan;
+    padding: 12pt;
+    background: cyan;
 }
 
 pre {
-	font-family: 'Source Code Pro', monospace;
+    font-family: 'Source Code Pro', monospace;
 }
 
 .post p, .post ul, .post pre, .post .alternative-solution {
-	margin-left: 4em;
+    margin-left: 4em;
 }
 
 .post .alternative-solution p {
-	margin-left: 0;	
+    margin-left: 0;
 }
