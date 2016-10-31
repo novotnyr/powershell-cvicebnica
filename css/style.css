@@ -24,7 +24,12 @@ body {
 
 .alternative-solution {
     padding: 12pt;
-    background: cyan;
+    background: #00522D;
+    color: white;
+}
+
+div.alternative-solution .highlighter-rouge pre {
+    margin-left: 0pt;
 }
 
 pre {
@@ -41,13 +46,13 @@ pre {
 
 .post .note {
     margin-left: 4em;
-    background: magenta;
+    background: #520025;
+    color: white;
 }
 
 .post .note p {
     margin-left: 0em;
     padding: 12pt;
-    background: magenta;
 }
 
 .post-content h1 {
