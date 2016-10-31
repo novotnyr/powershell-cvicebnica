@@ -54,3 +54,7 @@ pre {
     /* hide H1, as they are repeated in the page title */
     display: none;
 }
+
+.section-start {
+    margin-top: 12pt;
+}
