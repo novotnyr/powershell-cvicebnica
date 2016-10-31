@@ -1,5 +1,5 @@
 ---
-title: Cvičebnica z Powershellu -- súborový systém a adresáre
+title: Cvičebnica z Powershellu -- adresáre
 layout: page
 ---
 
