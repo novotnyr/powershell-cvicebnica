@@ -5,6 +5,7 @@ layout: page
 
 Providery
 =========
+
 Zistite všetkých providerov v systéme
 -------------------------------------
 
@@ -80,6 +81,21 @@ Alternatívne:
 	    % { $_.GetValue("DisplayName") + ": " + $_.GetValue("URL") }
 
 
+
+Zistite adresár, v ktorom sa nachádzajú položky Plochy.
+-----------------------------------------------------------
+Informáciu možno získať z registrov z položky 
+`HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders`, 
+v kľúči `Desktop`. 
+
+	(Get-Item 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders').GetValue("Desktop")
+
+Pomocou nástroja `regedit` overte, že sa naozaj v registroch nachádza.
+Položka je typu expandovateľný reťazec a premenná `%USERPROFILE%` sa
+automaticky expanduje na správnu hodnotu podľa aktuálne prihláseného
+používateľa.
+	
+	
 Zistite, či je nastavená systémová premenná `JAVA_HOME` [premenné prostredia]
 -----------------------------------------------------------------------------
 Provider `Env:` slúži na premenné prostredia.

@@ -5,7 +5,7 @@ body {
     line-height: 1.5;
 }
 
-.post {
+.page-content {
     margin: auto;
     max-width: 40em;
     width: 40em;
@@ -37,4 +37,20 @@ pre {
 
 .post .alternative-solution p {
     margin-left: 0;
+}
+
+.post .note {
+    margin-left: 4em;
+    background: magenta;
+}
+
+.post .note p {
+    margin-left: 0em;
+    padding: 12pt;
+    background: magenta;
+}
+
+.post-content h1 {
+    /* hide H1, as they are repeated in the page title */
+    display: none;
 }

@@ -162,5 +162,4 @@ Reštartujte počítač
 Reštartujte počítač [`Restart-Computer`]
 ----------------------------------------
 
-	
 	Restart-Computer

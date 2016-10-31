@@ -4,7 +4,8 @@ layout: page
 ---
 
 Služby
-=======
+======
+
 Vypíšte zoznam všetkých služieb vo Windowse.
 --------------------------------------------
 

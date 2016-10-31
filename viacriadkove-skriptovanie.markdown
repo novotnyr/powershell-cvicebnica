@@ -4,6 +4,7 @@ layout: page
 ---
 PowerShell ISE
 ==============
+
 Zoznámte sa s PowerShell ISE
 ----------------------------
 

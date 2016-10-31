@@ -1,3 +1,4 @@
 *.ipr
 *.iws
 _site
+/powershell-cvicebnica.iml

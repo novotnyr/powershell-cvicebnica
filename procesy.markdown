@@ -14,8 +14,8 @@ Cmdlet má alias zodpovedajúci linuxovej konvencii:
 	
     ps
 
-Vypíšte počet bežiacich inštancií `svchost`u.
--------------------------
+Vypíšte počet bežiacich inštancií `svchost`u. [`Get-Process`, `Measure-Object`]
+-------------------------------------------------------------------------------
 
     Get-Process svchost | Measure-Object
 
@@ -32,8 +32,8 @@ Skrátený zápis:
 
 	ps | gm
 
-Vypíšte zoznam procesov a ku každému procesu vypíšte cestu k spúšťaciemu súboru.
--------------------------
+Vypíšte zoznam procesov a ku každému procesu vypíšte cestu k spúšťaciemu súboru
+-------------------------------------------------------------------------------
 
     Get-Process | Select-Object Name, Path
 
