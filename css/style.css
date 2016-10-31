@@ -5,6 +5,10 @@ body {
     line-height: 1.5;
 }
 
+li {
+    list-style-type: square;
+}
+
 .page-content {
     margin: auto;
     max-width: 40em;
