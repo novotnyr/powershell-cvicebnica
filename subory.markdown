@@ -134,8 +134,8 @@ Vypíšte mená, ktoré sa končia na „A“
 	    ForEach-Object { $_.split(",")[0] } | 
 	        Where-Object {$_ -like "*a"}
 
-Vypíšte súbor `mena.txt`, ale nahraďte výskyt „študent“ výskytom „poslucháč“ [`-replace]
-----------------------------------------------------------------------------------------
+Vypíšte súbor `mena.txt`, ale nahraďte výskyt „študent“ výskytom „poslucháč“ [`-replace`]
+-----------------------------------------------------------------------------------------
 Operátor `-replace` nahrádza výskyt reťazca iným reťazcom
 
     "študentka" -replace "študent", "poslucháč"
@@ -149,8 +149,8 @@ Celá rúra cmdletov:
 	Get-Content mena.txt | 
 	    Where-Object { $_ -replace "študent", "poslucháč" } | 
 
-Nahraďte v súbore `mena.txt` výskyty „študent“ výskytom „poslucháč“ [`-replace]
--------------------------------------------------------------------------------
+Nahraďte v súbore `mena.txt` výskyty „študent“ výskytom „poslucháč“ [`-replace`]
+--------------------------------------------------------------------------------
 
 Prvý chybný nástrel:
 
