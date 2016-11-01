@@ -20,7 +20,11 @@ Otvorenie existujúcich skriptov spôsobí problémy pri spúšťaní.
 
 Zmeniť možno politiku vykonávania skriptov
 
-	Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
+	Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+Skrátený alias:
+
+    Set-ExecutionPolicy RemoteSigned CurrentUser
 
 Následne treba odsúhlasiť v GUI zmenu politiky. Táto politika umožní spúšťať všetky skripty, ale tie, ktoré sa stiahli z webu, musia byť digitálne podpísané.
 
