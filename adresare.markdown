@@ -17,8 +17,19 @@ Zistite, v ktorom adresári sa práve nachádzate pomocou [`Get-Location`]
 -----------------------------------------------------------------------
 
     Get-Location
-    
-Alias pre linuxových znalcov:
+
+Zistite, v ktorom adresári sa práve nachádzate pomocou [`Location`]
+-----------------------------------------------------------------------
+Ak má cmdlet názov `Get-[podstatné-meno]`, môžeme predponu `Get`
+vynechať. Zistiť adresár vieme cez:
+
+    Location
+
+Powershell si automaticky domyslí, že existuje cmdlet `Get-Location`.
+
+Zistite, v ktorom adresári sa práve nachádzate pomocou [`pwd`]
+--------------------------------------------------------------
+Možno použiť aj linuxový názov:
 
 	pwd
 
@@ -297,53 +308,24 @@ V cmdlete `Measure-Object` môžeme vynechať samotný názov parametra `-Proper
 
 	ls ~ *.xml -r | measure -sum length
 
-Vypíšte len adresáre v domovskom adresári [`Where-Object`]
-------------------------------
+Vypíšte len adresáre v domovskom adresári
+-----------------------------------------
 
-Vypisujme adresáre, ktoré majú isté vlastnosti, resp. ktoré spĺňajú danú 
-podmienku. Inými slovami, do výstupu pošleme len adresáre, ktoré prejdú filtrom.
-Na filtrovanie slúži cmdlet `Where-Object`:
+Cmdlet `Get-ChildItem` používaný na súboroch a adresároch súborového
+systému poskytuje parameter `-Directory`, ktorý ukáže len adresáre
 
-	Get-ChildItem | Where-Object { $_.PSIsContainer }
-
-V kučeravých zátvorkách sa nachádza výraz (*expression*) s booleovskou podmienkou. 
-
-Cmdlet `Get-ChildItem` posiela do rúry objekt za objektom, adresár za adresárom,
-súbor za súborom. Cmdlet `Where-Object` sa pozerá na objekt prichádzajúce z
-rúry, dosadí ho do špeciálnej premennej `$_` a v prípade, že je podmienka
-splnená, ho pošle ďalej do rúry. Ak podmienka splnená nie je, objekt sa zahodí a
-do rúry sa už nepošle.
-
-Každý adresár alebo súbor má vlastnosť `PSIsContainer`, ktorá je pravdivá pre
-adresáre, ale pre súbory už nie. Vieme ju použiť v podmienke.
-
-Alternatívny alias je `?`
-
-	ls | ? { $_.PSIsContainer }
-
-<div markdown="1" class="alternative-solution">
-V PowerShelli 3.0 a novšom možno použiť parameter `-Directory` na cmdlete `Get-ChildItem` a filtrovanie môžeme vynechať:
-
-	Get-ChildItem -Directory
-
-</div>
+    Get-ChildItem -Directory
 
 Zistite, koľko súborov sa nachádza v domovskom adresári a jeho podadresároch.
 ---------------------------------------
+Pomocou `Get-ChildItem` rekurzívne (`-Recurse`) vypíšeme všetky riadne súbory (`-File`).
 
-	Get-ChildItem -Recurse | 
-	    Where-Object {-not $_.PSIsContainer} | 
-	        Measure-Object
-
-V podmienke filtra sme použili negáciu cez `-not`. Alternatívne môžeme použiť aj výkričník:
-
-	Get-ChildItem -Recurse | 
-	    Where-Object {! $_.PSIsContainer} | 
-	        Measure-Object
+	Get-ChildItem -Recurse -File | 
+        Measure-Object
 
 Skrátený variant:
 
-	ls -r | ? { ! $_.PSIsContainer} | measure
+	ls -r -file | measure
 
 Vypíšte súbory a adresáre v domovskom adresári zotriedené podľa mena
 ------------------------------
@@ -358,18 +340,17 @@ Skrátený alias:
 	ls | sort
 
 Vypíšte len súbory zotriedené podľa veľkosti
---------
+--------------------------------------------
 
-	Get-ChildItem | 
-	    Where-Object { -not $_.PSIsContainer } | 
-	        Sort-Object -Property Length
+	Get-ChildItem -File | 
+        Sort-Object -Property Length
 
 Cmdlet `Sort-Object` má parameter, v ktorom určíme vlastnosť, podľa ktorého sa
 má triediť. Triedime podľa veľkosti (`length`).
 
 Skrátený alias:
 
-	ls | ? { ! $_.PSIsContainer } | sort length
+	ls -file | sort length
 
 Vypíšte súbory a adresáre zotriedené podľa veľkosti zostupne.
 -----------------------------------
@@ -431,7 +412,7 @@ Pri výpise adresára cez `Get-ChildItem` sme videli len štyri vlastnosti (`Mod
 </div>
 
 Vypíšte len plné cesty k všetkým súborom a adresárom v aktuálnom adresári, bez dekorácie
----------------
+----------------------------------------------------------------------------------------
 
 	Get-ChildItem | Select-Object -ExpandProperty FullName
 
@@ -470,38 +451,105 @@ Alternatívny zápis:
 
 	ls -r | sort length -desc | select FullName, Length -first 1
 
-Nájdite plné cesty k všetkým súborom väčším než 20 MB.
--------------------------------
+Nájdite plné cesty k všetkým súborom väčším než 20 MB [`Where-Object`]
+----------------------------------------------------------------------
+Vypisujme súbory, ktoré majú isté vlastnosti, resp. ktoré spĺňajú danú
+podmienku. Inými slovami, do výstupu pošleme len súbory, ktoré prejdú filtrom.
+Na filtrovanie slúži cmdlet `Where-Object`:
 
-	Get-ChildItem | 
-	    Where-Object { $_.Length -ge 20MB } | 
+	Get-ChildItem -Recurse | 
+	    Where-Object Length -ge 20MB | 
 	        Select-Object -ExpandProperty FullName
 
-Pozor! Porovnanie sa realizuje pomocou `–ge`. Znak `>` znamená presmerovanie 
+Cmdlet `Get-ChildItem` posiela do rúry objekt za objektom, adresár za adresárom,
+súbor za súborom. Cmdlet `Where-Object` sa postupne pozerá na objekty prichádzajúce
+z rúry. Pre každý objekt zistí, či preňho platí príslušná podmienka a ak áno,
+pošle ho ďalej do rúry. Ak podmienka splnená nie je, objekt sa zahodí a
+do rúry sa už nepošle.
+
+V našom prípade podmienka hovorí, že vlastnosť (_property_) `Length`
+každého objektu musí byť väčšia než 20 MB.
+
+Ale pozor! Porovnanie sa realizuje pomocou `–ge`. Znak `>` znamená presmerovanie
 a jeho použitie v porovnávaní povedie k chybe, resp. k presmerovaní do súboru 
 s obskúrnym názvom.
 
-Alternatívny zápis:
+Powershell umožňuje definovať veľkosti v čitateľnom tvare. Hodnota `20 MB`
+sa automaticky prepočíta na správnu veľkosť `20971520` bajtov.
 
-	ls -r | ? {$_.length -ge 20MB} | select FullName
-
-<div markdown="1" class="alternative-solution">
-Alternatívny zápis pre Powershell 3.0: 
+Cmdlet má skrátený zápis cez `Where` alebo cez úplne jednoduchý otáznik:
 
 	ls -r | ? length -ge 20MB | select FullName
 
-</div>
 
-Vypíšte súbory a adresáre určené len na čítanie.
-----------------------------
-Využime vlastnosť `Mode`:
+Nájdite plné cesty k všetkým súborom z roku 2015 [`Where-Object`]
+-----------------------------------------------------------------
+Každý súbor má vlastnosť `LastWriteTime`, ktorá obsahuje dátum a čas
+posledného zápisu. Hodnota tejto vlastnosti je tiež objekt (typu `datetime`),
+ktorý má opäť svoje vlastné vlastnosti. (Objekty môžu pozostávať z iných
+objektov, čo si povieme v neskoršej kapitole o objektovo orientovanom programovaní).
 
-	Get-ChildItem | Where-Object { $_.Mode -like "*r*" }
+Rok vytvorenia súboru vieme zistiť z vnorenej vlastnosti, na ktorú sa
+odkážeme pomocou `LastWriteTime.Year`.
 
-Operátor `–like` funguje podobne ako v databázach, pričom vieme vyhľadávať s použitím žolíkov. Znak `*` funguje ako zástupný symbol pre jeden či viac znakov.
+V tomto prípade však **nemôžeme** použiť tento príkaz:
 
-	ls | ? {$_.mode -like "*r*"}
+    # nefunguje!
+    Get-ChildItem | Where-Object LastWriteTime.Year -eq 2015
 
-Alternatívna, ale mylná možnosť je využiť vlastnosť `isReadOnly`; tá však funguje len na súboroch.
+Cmdlet `Where-Object` totiž nepodporuje vnorené vlastnosti v takomto tvare.
+Čo je horšie, vôbec nás neupozorní na to, že takýto zápis nie je podporovaný
+a vždy vráti prázdny výsledok!
+
+Namiesto toho musíme použiť iný zápis podmienky a to v podobe *bloku skriptu*
+(*script block*), ktorý pripomína programovanie v Jave, či C.
+
+    Get-ChildItem | Where-Object { $_.LastWriteTime.Year -eq 2015 }
+
+Cmdlet `Where-Object` vezme objekt prichádzajúci z rúry, dosadí ho
+do špeciálnej premennej `$_` a overí platnosť podmienky.
+
+Premenná `$_` má zvláštny názov, ale jej význam je jednoduchý: reprezentuje
+objekt, ktorého vlastnosť overujeme. Ak nás stále znepokojuje, môžeme
+použiť aj alternatívny názov `$PSItem`.
+
+V príklade overujeme vlastnosť `LastWriteTime.Year`, ktorú porovnávame
+s príslušnou hodnotou.
+
+Nájdite plné cesty k všetkým súborom z roku 2015, ktoré sú menšie ako 1 GB [`Where-Object`]
+-------------------------------------------------------------------------------------------
+
+Budeme potrebovať spájanie podmienok. Dve podmienky môžeme spojiť
+cez operátor `-and` reprezentujúci logické "a zároveň":
+
+    Get-ChildItem | 
+        Where-Object { $_.LastWriteTime.Year -eq 2015 -and $_.Length -le 1GB }
+
+Všimnime si, že pýtame sa na dve vlastnosti objektu, ktorý je reprezentovaný
+premennou `$_`: a to rok posledného zápisu a dĺžku.
+
+Alternatívny zápis používa premennú `$PSItem`:
+
+    Get-ChildItem | 
+        Where-Object { $PSItem.LastWriteTime.Year -eq 2015 -and $PSItem.Length -le 1GB }
+
+Vypíšte všetky adresáre, ktoré obsahujú aspoň jednu MP3ku [`ForEach-Object`]
+----------------------------------------------------------------------------
+
+Najprv získame zoznam všetkých MP3 súborov. Následne pre každý súbor získame názov
+nadradeného adresára a pošleme ho ďalej dú rúry. Aby sme predišli
+opakovaným výskytom, adresáre zotriedime (`Sort-Object`), aby sme ich
+mohli prehnať cez `Get-Unique`, ktorý vyhodí duplicitné riadky.
+
+Triedenie je potrebné, pretože bez nich `Get-Unique` nebude fungovať správne.
+
+    Get-ChildItem . *.mp3 -Recurse |
+        Select-Object -ExpandProperty DirectoryName |
+            Sort-Object | 
+                | Get-Unique
+
+
+
+
 
 

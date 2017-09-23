@@ -1,0 +1,180 @@
+Todo
+----
+*   Chýba aj použitie `PSIIsContainer`
+*   Chýba použitie `-not` a výkričníka
+*   Chýba použitie `$_` a `like` operátora
+*   Chýba použitie `ForEach-Object`
+
+Vypíšte súbory a adresáre určené len na čítanie.
+----------------------------
+Využime vlastnosť `Mode`:
+
+   Get-ChildItem | Where-Object { $_.Mode -like "*r*" }
+
+Operátor `–like` funguje podobne ako v databázach, pričom vieme vyhľadávať s použitím žolíkov. Znak `*` funguje ako zástupný symbol pre jeden či viac znakov.
+
+   ls | ? {$_.mode -like "*r*"}
+
+Alternatívna, ale mylná možnosť je využiť vlastnosť `isReadOnly`; tá však funguje len na súboroch.
+
+
+Vytvorte v domovskom adresári zoznam desiatich súborov tyzden1.txt ... tyzden10.txt [`For-Each`]
+------------------------------------------------------------------------------------------------
+
+   1..10 | ForEach-Object { Set-Content tyzden$_.txt -Value "" }
+
+V textovom editore vytvorte súbor mena.txt s nasledovným obsahom:
+-----------------------------------------------------------
+
+   Jozef Košický,študent,Hlavná 25,Košice
+   Milan Košický,študent,Leninova 66,Košice
+   Zuzana Mikulášska,zamestnankyňa,Poľná 25, Liptovský Mikuláš
+   Júlia Spišskohôrna,študentka,Alana Turinga 25, Spišská Hôrna
+   Jeremiáš Prešovský,školník,Industriálna 15, Prešov
+
+Vypíšte len riadky, ktoré obsahujú študentov [`like`]
+-----------------------------------------------------
+Na výber riadkov z rúry použijeme filter, teda `Where-Object`.
+Filter bude reprezentovať otázka "obsahuje riadok podreťazec `študent`?"
+
+Nebudeme sa pýtať na vlastnosť (`property`) riadka, ale na celý riadok.
+V tomto prípade musíme použiť inú syntax.
+
+   Get-Content mena.txt | Where-Object { $_ -like "*študent*" }
+
+V kučeravých zátvorkách sa nachádza výraz (*expression*) s booleovskou podmienkou.
+
+Cmdlet `Get-ChildItem` posiela do rúry objekt za objektom, teda riadok za
+riadkom. Cmdlet `Where-Object` sa pozerá na objekt prichádzajúci z
+rúry, dosadí ho do špeciálnej premennej `$_` a v prípade, že je podmienka
+splnená, pošle ho ďalej do rúry. Ak podmienka splnená nie je, objekt sa zahodí a
+do rúry sa už nepošle.
+
+Premenný `$_` má zvláštny názov, ale jej význam je jednoduchý: reprezentuje
+objekt, ktorého vlastnosť overujeme. Ak nás stále znepokojuje, môžeme
+použiť aj alternatívny názov `$PSItem`.
+
+V našom prípade overujeme v podmienke výskyt podreťazca. Využime na to
+operátor `-like`, ktorý funguje podobne ako v jazyku SQL.
+
+*   Hviezdička `*` predstavuje zástupný symbol (žolík) za viaceré znaky
+*   Otáznik `?` je zástupný symbol pre jeden znak.
+
+Rýchly výpis využíva alias:
+
+   gc mena.txt | ? {$_ -like "*študent*"}
+
+<div class="note" markdown="1">
+V Powershelli 2.0 a staršom boli zložené zátvorky a premenná `$_` jediný
+možný zápis podmienok v cmdlete `Where-Object`.
+</div>
+
+Vypíšte len riadky, ktoré obsahujú študentov [`match`]
+------------------------------------------------------
+
+   Get-Content mena.txt | Where-Object {$_ -match "študent"}
+
+Operátor `-match` umožňuje nájsť rýchlu zhodu reťazca s riadkami. Na
+rozdiel od `-like` nie je nutné používať hviezdičky a otázniky, na
+druhej strane môže dôjsť k nečakaným prekvapeniam. `-match` totiž
+umožňuje zložité vyhľadávanie pomocou regulárnych výrazov, ktoré budú
+demonštrované neskôr.
+
+Súbor je reprezentovaný ako zoznam reťazcových riadkov, overte to:
+-----------------------------------------------------------
+
+   Get-Content mena.txt | Get-Member
+
+Vypíšte len riadky, ktoré obsahujú študentov začínajúcich sa na „J“
+-----------------------------------------------------------
+
+   Get-Content mena.txt | Where-Object { $_ -like "J*" }
+
+Vypíšte len riadky, ktoré sa začínajú sa na „J“ a reprezentujú len zamestnancov
+-----------------------------------------------------------
+
+   Get-Content mena.txt |
+       Where-Object { ($_ -like "J*") -and ($_ -notlike "*zamestnanec*") }
+
+Vypíšte jednotlivé slová z gramatickej vety zadanej na vstupe [`-split`]
+------------------------------------------------------------------------
+Operátor `-split` rozdelí reťazec na podreťazce na základe oddeľovača:
+
+   "Byť, či nebyť, to je otázka" -split " "
+
+Výsledkom je zoznam jednotlivých slov, pretože oddeľovačom je medzera.
+
+Z textu vypíšte len prvé slovo (metódy `split()`)
+-------------------------------------------------
+Reťazce v Powershelli sú objekty, ktoré majú schopnosti reprezentované
+*metódami*. Metóda `split()` rozdelí reťazec podľa oddeľovača do poľa
+reťazcov.
+
+   "Byť, či nebyť, to je otázka".split()
+
+K zoznamu môžeme pristupovať pomocou poľovej notácie.
+
+    "Byť, či nebyť, to je otázka".split()[0]
+
+Ak nepoužijeme žiaden oddeľovač, použijú sa znaky bielych miest
+(whitespace, teda medzery, nové riadky atď).
+
+Vypíšte len mená zo súboru `mena.txt`
+-------------------------------------
+
+   Get-Content mena.txt | ForEach-Object { $_.split(",")[0] }
+
+Použili sme oddeľovač čiarky, teda `,`.
+
+Vypíšte mená, ktoré sa končia na „A“
+------------------------------------
+
+   Get-Content mena.txt |
+       ForEach-Object { $_.split(",")[0] } |
+           Where-Object {$_ -like "*a"}
+
+Vypíšte súbor `mena.txt`, ale nahraďte výskyt „študent“ výskytom „poslucháč“ [`-replace`]
+-----------------------------------------------------------------------------------------
+Operátor `-replace` nahrádza výskyt reťazca iným reťazcom
+
+    "študentka" -replace "študent", "poslucháč"
+
+Výsledkom je:
+
+    poslucháčka
+
+Celá rúra cmdletov:
+
+   Get-Content mena.txt |
+       Where-Object { $_ -replace "študent", "poslucháč" } |
+
+Nahraďte v súbore `mena.txt` výskyty „študent“ výskytom „poslucháč“ [`-replace`]
+--------------------------------------------------------------------------------
+
+Prvý chybný nástrel:
+
+   Get-Content mena.txt |
+       ForEach-Object { $_ -replace "študent", "poslucháč" } |
+           Set-Content mena.txt
+
+Dostaneme hlášku `The process cannot access the file because it is being
+used by another process`.
+
+`Get-Content` načítava postupne riadok za riadkom zo súboru, a posiela
+ho do `Where-Object`, a následne do `Set-Content`. Toto spracovávanie sa
+deje paralelne (kým sa zapisuje prvý riadok, už sa môže načítavať tretí
+riadok). Žiaľ, cmdlety pracujú nad jedným súborom a "šliapu si po
+prstoch", čo nie je dovolené.
+
+### Správne riešenie
+Cmdlet, ktorý je uvedený v zátvorkách, nebude posielať položky do rúry
+postupne, ale najprv ich všetky spracuje a do rúry ich pošle naraz.
+
+   ( Get-Content mena.txt ) |
+       ForEach-Object { $_ -replace "študent", "poslucháč" } |
+           Set-Content mena.txt
+
+Cmdlet `Get-Content` načíta všetky riadky zo súboru, potom ich pošle
+do rúry, kde sa následne vykoná nahrádzanie a zápis do súboru.
+
+

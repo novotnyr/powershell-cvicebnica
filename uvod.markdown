@@ -4,18 +4,13 @@ layout: page
 ---
 
 Inštalácia
-=========
+==========
+V tomto tutoriále sa budeme venovať Powershellu vo verzii 3.0. I keď
+to zďaleka nie je najnovšia verzia (v septembri 2017 sa už vyvíja PowerShell
+6.0), ide verziu, ktorá je zrejme najviac rozšírená.
 
-**PowerShell 2.0** je automaticky dostupný vo Windows 7 a Windows 2008 R2. Pre
-staršie verzie Windowsu navštívte
-[http://support.microsoft.com/kb/968929](http://support.microsoft.com/kb/968929)
-a stiahnite *Windows Management Framework Core (WinRM 2.0 and Windows PowerShell
-2.0)*.
-
-Od septembra 2012 je k dispozícii **PowerShell 3.0** pre Windows 7 Service Pack
-1, Windows Server 2008 R2 SP1, Windows Server 2008 Service Pack 2.
-
-V tomto tutoriále sa však stále budeme venovať verzii 2.0.
+Powershell 3.0 je automaticky k dispozícii na Windows 7 Service Pack 1,
+Windows Server 2008 R2 SP1 a Windows Server 2008 Service Pack 2.
 
 Úvodné úlohy
 =============
@@ -25,13 +20,13 @@ Spustite PowerShell
 
 	Start | powershell.exe
 
-Spustite Powershell 2.0
------------------------
+Spustite Powershell 3.0
+------------------------
 
 Na moderných Windowsoch sa automaticky spúšťa najnovší Powershell. Na zachovanie 
 spätnej kompatibility môžete explicitne spustiť konkrétnu verziu.
 
-	powershell -version 2.0
+	powershell -version 3.0
 
 Overte následne spustenú verziu.
 

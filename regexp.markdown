@@ -35,7 +35,7 @@ Predstavme si ukážkové dáta v súbore `windows.txt`.
 Vypíšte vydania Windowsu vydané v roku 2015 [`Where-Object` a `match`]
 ----------------------------------
 
-	Get-Content windows.txt | Select-String 2015 }
+	Get-Content windows.txt | Select-String 2015
 
 Každý riadok súboru sa odošle do rúry, kde je filtrovaný pomocou operátora `-match`. Tento operátor berie ako parameter *regulárny výraz*, ktorý sa musí zhodovať s riadkom súboru.
 

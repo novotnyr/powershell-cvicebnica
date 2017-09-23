@@ -22,21 +22,20 @@ Ako vybrať z objektov v rúre len niektoré?
 
 Filtrujte objekty cez `Where-Object`.
 
-	Get-ChildItem | Where-Object { $_.Length -gt 20 MB }
-
-Ako vybrať z objektov v rúre len niektoré vlastnosti [PowerShell 3.0]
----------------------------------------------------------------------
-
-V PowerShelli 3.0 a novšom je skrátený zápis pre prípady, že v podmienke overujete len jednu vlastnosť. Zložené zátvorky i špeciálnu premennú `$_` vynecháme:
-
-	Get-ChildItem | Where-Object Length -gt 20MB 
+    Get-ChildItem | Where-Object Length -gt 20MB
 
 Takto môžeme zápisy skracovať na minimum:
 
 	gci | ? Length -gt 20MB
 
+To funguje pre prípady, že sa overuje jedna vlastnosť. Ak sa
+overuje zložená podmienka alebo sa overuje vnorená vlastnosť, je
+potrebné použiť špeciálnu premennú `$_`, resp. `$PSItem`.
+
+	Get-ChildItem | Where-Object { $_.Length -gt 20 MB }
+
 Ako vybrať z objektu len niektoré vlastnosti?
------
+---------------------------------------------
 
 Stačí použiť `Select-Object`.
 
@@ -57,22 +56,17 @@ V príklade posielame do rúry objekty pre súbory či adresáre a cmdlet `Selec
 
 ### Bodkové notácie
 
-Ak cmdlety vracajú do rúry len jeden objekt, môžeme vlastnosť vytiahnuť pomocou bodkovej notácie.
+Vlastnosť môžeme získať aj pomocou bodkovej notácie.
 
 	(Get-Item C:/Windows/win.ini).Length
 
-Ako vybrať z objektu výhradne jednu vlastnosť? [Powershell 3.0] 
----------------------------------------------------------------
-Powershell 3.0 podporuje bodkovú notáciu aj pre skupinu objektov.
+Bodková notácia funguje aj pre skupiny objektov:
 
     (Get-ChildItem *.mp3).FullName
 
 Cmdlet `Get-ChildItem` s filtrom pre vyhľadávanie MP3 súborov pošle do
 rúry jeden alebo viacero súborov. Vďaka použitiu zátvoriek a bodkovej
 notácii vieme vrátiť len vlastnosť `FullName` pre každý z objektov.
-
-Powershell 2.0 sa správa menej pohodlne: ak je výsledkom cmdletu viacero
-objektov, použitie zátvoriek a bodkovej notácie nebude fungovať.
 
 Ako spracovať objekty v rúre?
 -----------------------------
@@ -92,7 +86,7 @@ Medzi zložené zátvorky `{` a `}` sa uvádza skript, ktorý sa vykoná pre
 každý objekt, ktorý príde z rúry do cmdletu `ForEach-Object`. Tento
 objekt k dispozícii v skripte v špeciálnej premennej `$_`.
  
-V Powershelli 3.0 je objekt k dispozícii aj ako premenná `$PSItem`.
+Objekt k dispozícii aj ako premenná `$PSItem`, ktorá je identická ako `$_`.
     
 Skrátený alias:
 
@@ -104,7 +98,8 @@ Cmdlet `ForEach-Object` sa vie správať ako `Select-Object`:
     Get-ChildItem | Select-Object -ExpandProperty Name
     Get-ChildItem | ForEach-Object { $_.Name }
 
-V Powershelli 3.0 je aj skrátená možnosť:
+K dispozícii je aj skrátená možnosť, ktorá funguje pre jednoduché (nevnorené)
+vlastnosti:
 
     Get-ChildItem | ForEach-Object Name
     
@@ -126,3 +121,11 @@ sú konkrétne zoskupené objekty.
     Count Name                      Group
     ----- ----                      -----
        12                           {Contacts, Desktop, Documents, Downloads...}
+
+Ako získať unikátne objekty
+---------------------------
+
+    (Get-Process).ProcessName | Sort-Object | Get-Unique
+
+Cmdlet `Get-Unique` odfiltruje duplicitné objekty z rúry. Podmienkou je, aby
+boli prichádzajúce objekty usporiadané!
