@@ -7,7 +7,7 @@ Súborový systém a adresáre
 ==========================
 
 Zistite, v ktorom adresári sa práve nachádzate.
------------
+-----------------------------------------------
 
 Zistiť to môžeme pohľadom na výzvu (prompt).
 
@@ -19,7 +19,7 @@ Zistite, v ktorom adresári sa práve nachádzate pomocou [`Get-Location`]
     Get-Location
 
 Zistite, v ktorom adresári sa práve nachádzate pomocou [`Location`]
------------------------------------------------------------------------
+-------------------------------------------------------------------
 Ak má cmdlet názov `Get-[podstatné-meno]`, môžeme predponu `Get`
 vynechať. Zistiť adresár vieme cez:
 
@@ -34,7 +34,7 @@ Možno použiť aj linuxový názov:
 	pwd
 
 Zobrazte súbory a adresáre v aktuálnom podadresári [`Get-ChildItem`]
-----------------------------------------------------------------------------
+--------------------------------------------------------------------
 
 	Get-ChildItem
 
@@ -51,7 +51,7 @@ Linuxácky alias:
 	ls
 
 Zobrazte súbory a adresáre v aktuálnom podadresári [`dir`]
------------------------------------------------------------
+----------------------------------------------------------
 
 Ak ste veteráni MS-DOSu a klasického windowsovského shellu `cmd.exe`,
 môžete použiť:
@@ -119,7 +119,7 @@ Zapíšte názvy súborov a adresárov do externého súboru
 Výstup ľubovoľného cmdletu možno zapísať do textového súboru použitím presmerovania cez `>`.
 
 Overte existenciu súboru `subory.txt`
---------------
+-------------------------------------
 
 	Get-ChildItem subory.txt
 
@@ -136,15 +136,15 @@ Alternatívne pomocou cmdletu `gi`, aliasu pre `Get-Item`
 	gi subory.txt
 
 Otvorte `subory.txt` v textovom editore
----------------
+---------------------------------------
 
 	notepad subory.txt
 
 Adresáre
-=========
+========
 
 Vypíšte obsah vlastného domovského adresára.
-----------
+--------------------------------------------
 Ak ste v domovskom adresári, tak:
 
 	Get-ChildItem ~
@@ -161,7 +161,7 @@ Alternatívne:
 
 
 Presuňte sa do adresára `C:\Windows`
------------------------------------
+------------------------------------
 
 	Set-Location C:\Windows
 
@@ -170,7 +170,7 @@ V praxi sa však oveľa lepšie používa osvedčený alias:
 	cd C:\Windows
 
 Vypíšte všetky súbory a adresáre v `C:/Users`
-------
+---------------------------------------------
 
 	Get-ChildItem C:\Users
 
@@ -187,7 +187,7 @@ Alternatívne:
 	gci C:\Users
 
 Vypíšte všetky súbory a adresáre v `C:/Users`, ktoré sa začínajú na „P“.
-------------------------------------------------------------
+------------------------------------------------------------------------
 Možnosť 1:
 
 	cd C:\Users
@@ -198,7 +198,7 @@ Možnosť 2:
 	Get-ChildItem C:\Users\P*
 
 Vypíšte všetky súbory typu XML v domovskom adresári.
--------------------------------------------
+----------------------------------------------------
 
 	Get-ChildItem ~ *.xml
 
@@ -207,7 +207,7 @@ Alternatívne:
 	ls ~ *.xml
 
 Vypíšte všetky súbory v aktuálnom adresári a vo všetkých jeho podadresároch.
----------------------------------
+----------------------------------------------------------------------------
 
 	Get-ChildItem –Recurse
 
@@ -216,7 +216,7 @@ Parametre možno skracovať, kým nedôjde k nejednoznačnosti:
 	gci -r
 
 Vypíšte všetky XML súbory v domovskom adresári a vo všetkých jeho podadresároch.
-------------------------------------------
+--------------------------------------------------------------------------------
 Pozor! Linuxáci skúsia použiť:
 
 	ls ~ *.xml –r # nefunguje!
@@ -258,7 +258,7 @@ filter (`-Filter`).
 </div>
 
 Vypíšte len plochý zoznam súborov z predošlej úlohy
-----------------
+---------------------------------------------------
 	
 	Get-ChildItem ~ *.xml -Recurse -Name
 
@@ -317,7 +317,7 @@ systému poskytuje parameter `-Directory`, ktorý ukáže len adresáre
     Get-ChildItem -Directory
 
 Zistite, koľko súborov sa nachádza v domovskom adresári a jeho podadresároch.
----------------------------------------
+-----------------------------------------------------------------------------
 Pomocou `Get-ChildItem` rekurzívne (`-Recurse`) vypíšeme všetky riadne súbory (`-File`).
 
 	Get-ChildItem -Recurse -File | 
@@ -328,7 +328,7 @@ Skrátený variant:
 	ls -r -file | measure
 
 Vypíšte súbory a adresáre v domovskom adresári zotriedené podľa mena
-------------------------------
+--------------------------------------------------------------------
 
 	Get-ChildItem | Sort-Object
 
@@ -353,7 +353,7 @@ Skrátený alias:
 	ls -file | sort length
 
 Vypíšte súbory a adresáre zotriedené podľa veľkosti zostupne.
------------------------------------
+-------------------------------------------------------------
 
 	Get-ChildItem | Sort-Object -Property Length -Descending
 
@@ -364,10 +364,12 @@ Parameter možno skrátiť:
 Ak sa parameter skráti na `–d`, nastane chyba nejednoznačnosti názvu parametra 
 (pri sorte existujú dva: `-debug` a `–descending`)
 
-Nájdite najväčší súbor v domovskom adresári, bez vnárania ([`Select`])
----------------------------------------------
+Nájdite najväčší súbor v domovskom adresári, bez vnárania (`Select-Object`)
+---------------------------------------------------------------------------
 
-	Get-ChildItem | Sort-Object -Property Length -Descending | Select-Object -First 1
+	Get-ChildItem | 
+	    Sort-Object -Property Length -Descending | 
+	        Select-Object -First 1
 
 Cmdlet `Select-Object` dokáže filtrovať prvých/posledných *n* záznamov, 
 stránkovať a podobne. V našom príklade sme vybrali prvý objekt z rúry, resp. prvý objekt zo zoznamu súborov utriedených podľa veľkosti
@@ -375,7 +377,7 @@ stránkovať a podobne. V našom príklade sme vybrali prvý objekt z rúry, res
 	ls | sort length -Desc | select -f 1
 
 Vypíšte plné cesty k všetkým súborom a adresárom v aktuálnom adresári
----------------
+---------------------------------------------------------------------
 
 	Get-ChildItem | Select-Object FullName
 
@@ -438,7 +440,7 @@ Alternatívny zápis:
 	ls | select -exp fullname
 
 Nájdite plnú cestu a veľkosť najväčšieho súboru v domovskom adresári vrátane podadresárov.
---------------------
+------------------------------------------------------------------------------------------
 
 	Get-ChildItem -Recurse | 
 	    Sort-Object -Property Length -Descending | 
