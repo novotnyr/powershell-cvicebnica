@@ -58,7 +58,8 @@ Výsledok bude:
 
 `Select-String` vypisuje podrobné informácie o zhode obsahujúce názov súboru a číslo riadku, na ktorom sa zhoda našla. Hodí sa to pri vyhľadávaní vo viacerých súboroch.
 
-Regulárny výraz nie je nutné dávať do úvodzoviek. Vzhľadom na množstvo špeciálnych znakov sa však silne odporúča predsa len využívať úvodzovky, čím sa predíde nečakaným prekvapeniam.
+Akýkoľvek zložitejší regulárny výraz sa silne odporúča dávať do úvodzoviek,
+čím sa predíde nečakaným prekvapeniam.
 
 <div markdown="1" class="alternative-solution">
 `Select-String` je powershellovský protipól linuxového príkazu `grep`.
@@ -70,7 +71,6 @@ Vypíšte vydania Windowsu vydané v roku 2015 [bez názvov súborov a výskytov
 	Get-Content windows.txt | Select-String 2015
 
 Tento variant, kde `Select-String` použijeme ako filter v rúre, sa na výstupe nebudú ukazovať informácie o názve súboru, či číslach riadkov.
-
 
 Vypíšte vydania Windowsu vydané v roku 2013
 -------------------------------------------
