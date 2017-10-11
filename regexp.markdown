@@ -11,7 +11,7 @@ Regulárny výraz je reťazec predstavujúci predpis pre vyhľadávanie zložit�
 Regulárne výrazy však môžu obsahovať veľmi zložité predpisy pre vyhľadávanie, ktoré by sa inak muselo zložitým spôsobom programovať. Ide o situácie, keď chceme hľadať opakovania reťazcov, vyhľadávať so sadou povolených, či zakázaných znakov, alebo hľadať viacero podreťazcov súčasne.
 
 Ukážkové dáta
---------------
+-------------
 
 Predstavme si ukážkové dáta v súbore `windows.txt`.
 
@@ -33,7 +33,7 @@ Predstavme si ukážkové dáta v súbore `windows.txt`.
 	2016-09-26 Windows Server 2016 [vNext] #win #win-nt #server
 
 Vypíšte vydania Windowsu vydané v roku 2015 [`Where-Object` a `match`]
-----------------------------------
+----------------------------------------------------------------------
 
 	Get-Content windows.txt | Select-String 2015
 
@@ -43,7 +43,7 @@ Každý riadok súboru sa odošle do rúry, kde je filtrovaný pomocou operátor
 
 
 Vypíšte vydania Windowsu vydané v roku 2015
----------------------
+-------------------------------------------
 
 	Select-String 2015 windows.txt
 
@@ -65,7 +65,7 @@ Regulárny výraz nie je nutné dávať do úvodzoviek. Vzhľadom na množstvo �
 </div>
 
 Vypíšte vydania Windowsu vydané v roku 2015 [bez názvov súborov a výskytov]
----------------------------------
+---------------------------------------------------------------------------
 
 	Get-Content windows.txt | Select-String 2015
 
@@ -73,7 +73,7 @@ Tento variant, kde `Select-String` použijeme ako filter v rúre, sa na výstupe
 
 
 Vypíšte vydania Windowsu vydané v roku 2013
----------------------------------
+-------------------------------------------
 Nemôžeme hľadať jednoduchú zhodu cez `2012`, pretože by sme dostali aj *Windows Server 2012 R2* z roku 2013. 
 
 Použime regulárny výraz ukotvený k začiatku riadku. Znak `^` predstavuje ukotvenie vyhľadávaného predpisu ku začiatku riadku.
@@ -81,7 +81,7 @@ Použime regulárny výraz ukotvený k začiatku riadku. Znak `^` predstavuje uk
 	Get-Content windows.txt | Select-String "^2013"
 
 Vypíšte serverovské edície
----------------------------------
+--------------------------
 
 Použime ukotvenie ku koncu riadku
 
@@ -92,36 +92,54 @@ Alternatívne hľadajme len *Windows Server*:
 	Get-Content windows.txt | Select-String "Windows Server"
 
 Vypíšte systémy vydané v októbri [bodka ako zástupný znak]
-----------------------------------
+----------------------------------------------------------
 
-Hrubé riešenie použije bodku `.` ako zástupný symbol pre jeden znak. Použijeme štyri bodky pre štyri cifry v roku
+Hrubé riešenie použije bodku `.` ako zástupný symbol pre jeden znak. Použijeme štyri bodky pre štyri cifry v roku,
+čo zodpovedá regulárnemu výrazu `....-10`.
 
-	Get-Content windows.txt | Select-String "....-10" 
+
+	Get-Content windows.txt | 
+	    Select-String "....-10" 
 
 Vypíšte systémy vydané v októbri [opakovania]
-----
+---------------------------------------------
 Opakovanie, kde je jasný presný počet, vyjadríme výrazom v zložených zátvorkách. Výraz `.{4}` znamená "ľubovoľný znak opakovaný štyrikrát".
 
-	Get-Content windows.txt | Select-String ".{4}-10"
+	Get-Content windows.txt | 
+	    Select-String ".{4}-10"
 
 Vypíšte systémy v rokoch 2000-2009 [sady znakov]
-----------------------------------
+------------------------------------------------
 
 V hranatých zátvorkách môžeme vyjadriť sadu povolených znakov.
 
-	Get-Content windows.txt | Select-String "^200[0123456789]"
+	Get-Content windows.txt | 
+	    Select-String "^200[0123456789]"
 
 Toto riešenie je však ťažkopádne, keď vieme používať rozsahy povolených znakov.
 
 Vypíšte systémy v rokoch 2000-2009 [rozsahy znakov]
-----------------------------------
+---------------------------------------------------
 
 V hranatých zátvorkách môžeme vyjadriť sadu povolených znakov. Výraz `[0-9]` reprezentuju znaky od nuly po deviatku.
 
-	Get-Content windows.txt | Select-String "^200[0-9]"
+	Get-Content windows.txt | 
+	    Select-String "^200[0-9]"
+
+Vypíšte systémy v rokoch 2000-2009 [rozsahy znakov]
+---------------------------------------------------
+
+Regulárne výrazy často definujú skratky pre typické rozsahy znakov.
+Znak reprezentujúci cifru možno vyjadriť buď sadou `[0-9]` alebo
+skratkou `\d` (*d*ecimal).
+
+Výraz sa potom skráti na nasledovnú rúru:
+
+	Get-Content windows.txt | 
+	    Select-String "^200\d"
 
 Vypíšte systémy, ktoré nemali číslo verzie v oficiálnom názve [negácia rozsahu znakov]
---------------------
+--------------------------------------------------------------------------------------
 
 Ak chceme použiť sadu *zakázaných* znakov, v hranatých zátvorkách je na prvom mieste strieška `^`. 
 
@@ -131,85 +149,186 @@ V úlohe stačí vylúčiť čísla a bodku, čo dosiahneme výrazom
 
 Výraz čítame ako "nie je povolená nula až deviatka a bodka".
 
-	Get-Content windows.txt | Select-String "Windows [^0-9.]"
+	Get-Content windows.txt | 
+	    Select-String "Windows [^0-9.]"
 
 V úlohe sú dve nečakané situácie:
 
 *	strieška má v regulárnych výrazoch dva odlišné významy: znamená ukotvenie k začiatku riadku a zároveň reprezentuje negáciu pri sade znakov.
 *	bodka v sade znakov neznamená zástupný symbol pre ľubovoľný znak, ale doslovný znak bodky
 
+### Alternatívne riešenie [`\d`, `\D`]
+
+Regulárny výraz `[^0-9]` môžeme zapísať skrátením cez:
+
+    [^\d]
+
+To reprezentuje sadu znakov "nie cifry". Tento zápis možno ešte skrátiť na:
+
+    \D
+
+Reprezentuje to "nečíselný znak".
+
+	Get-Content windows.txt | 
+	    Select-String "Windows \D"
+
 Vypíšte systémy, ktoré majú v názve číslo roku [rozsahy znakov s opakovaním]
-------------
+----------------------------------------------------------------------------
 
 Hľadáme systémy, ktoré majú v názve *Windows*, a chceme pokryť dvojciferné verzie (ako napr. 98), ale aj typické štvorciferné Windows 2000. 
 
-	Get-Content windows.txt | Select-String "Windows [0-9]{2,4}"
+	Get-Content windows.txt | 
+	    Select-String "Windows [0-9]{2,4}"
+
+### Alternatívne riešenie so sadou znakou [`\d`]
+
+Ak použijeme skratku pre znak reprezentujúci číslo (`\d`), cmdlet sa skráti:
+
+	Get-Content windows.txt | 
+	    Select-String "Windows \d{2,4}"
+
 
 Vypíšte systémy, ktoré majú v názve číslo roku, ale neignorujme serverovské edície [rozsahy znakov s opakovaním, zástupný znak hviezdička]
-------------
-Hľadáme systémy, ktoré majú v názve *Windows*, a chceme pokryť dvojciferné verzie (ako napr. 98), ale aj typické štvorciferné Windows 2000. Zároveň potrebujeme pokryť situácie, kde medzi *Windows* a číslom verzie je nepovinný *Server*. To vyjadríme cez opakovanie ľubovoľného znaku, čo reprezentuje cez výraz `.*`.
+------------------------------------------------------------------------------------------------------------------------------------------
+Hľadáme systémy, ktoré majú v názve *Windows*, a chceme pokryť dvojciferné
+verzie (ako napr. 98), ale aj typické štvorciferné Windows 2000. Zároveň
+potrebujeme pokryť situácie, kde medzi *Windows* a číslom verzie je
+nepovinný *Server*. To vyjadríme cez opakovanie ľubovoľného znaku, čo
+reprezentuje cez výraz `.*`.
 
-	Get-Content windows.txt | Select-String "Windows.*[0-9]{2,4}"
+	Get-Content windows.txt | 
+	    Select-String "Windows.*[0-9]{2,4}"
 
-Výraz znamená "hľadaj najprv *Windows*, za ním ľubovoľný znak opakovaný nula či viakrát a za ním idú dve alebo štyri čísla"
+Výraz znamená "hľadaj najprv *Windows*, za ním ľubovoľný znak opakovaný nula
+či viakrát a za ním idú dve alebo štyri čísla"
+
+### Alternatívne riešenie
+
+	Get-Content windows.txt | 
+	    Select-String "Windows.*\d{2,4}"
+
 
 Vypíšte systémy, ktoré majú v názve číslo roku, ale neignorujme serverovské edície [skupiny, voliteľný reťazec]
-------------
+---------------------------------------------------------------------------------------------------------------
+
 Hľadáme systémy, ktoré majú v názve *Windows*, nasledovaný nepovinným serverom a číslom roku (či už dvojciferným alebo štvorciferným). 
 
 Nepovinný reťazec môžeme označiť ako **skupinu znakov** opakovanú nula alebo raz. Skupiny ohraničujeme bežnými zátvorkami.
 
-	Get-Content windows.txt | Select-String "Windows (Server ){0,1}[0-9]{2,4}"
+Regulárny výraz bude vyzerať nasledovne:
+
+    Windows (Server ){0,1}[0-9]{2,4}
 
 Regulárny výraz čítame postupne zľava doprava:
 
-*	najprv ide *Windows*
+*	najprv ide reťazec *Windows*
 *	za ním ide skupina s reťazcom *Server* a medzerou opakovaná nula alebo raz, čo z nej robí nepovinný reťazec
 *	za ním ide skupina dvoch až štyroch cifier
 
-Pozor, skupina (*group*) nie je to isté ako sada znakov (*character set*). Skupina je označená v zátvorkách a znamená presnú postupnosť znakov v danom poradí. Sada znakov reprezentuje množinu znakov, ku ktorej sa hľadá zhoda (*match*).
+Pozor, skupina (*group*) nie je to isté ako sada znakov (*character set*)! Skupina je označená
+v zátvorkách a znamená presnú postupnosť znakov v danom poradí. Sada znakov reprezentuje množinu znakov,
+ku ktorej sa hľadá zhoda (*match*).
+
+	Get-Content windows.txt | 
+	    Select-String "Windows (Server ){0,1}[0-9]{2,4}"
+
+### Alternatívne riešenie [skratka pre nepovinné skupiny, skratka pre čísla]
+
+Skupinu s nula alebo jedným výskytom, teda nepovinný reťazec, môžeme zapísať
+pomocou otáznika.
+
+Nasledovné dva regulárne výrazy sú ekvivalentné:
+
+    Windows (Server ){0,1}[0-9]{2,4}   
+
+Zápis `{0,1}` je rovnaký ako `?`:
+
+    Windows (Server )?[0-9]{2,4}
+
+Ak využijeme ďalšie skrátenie pre cifry, vieme získať "optimalizovaný"
+výraz:
+
+    Windows (Server )?\d{2,4}
 
 Vypíšte len roky, keď vyšiel Windows [premenná `$matches`]
--------------------------------
-V tejto úlohe nebudeme len zisťovať, či riadok súboru zodpovedá regulárnemu výrazu, ale budeme získavať časti riadka, ktoré vypíšeme. Takéto situácie už však nedokážeme pokryť cmdletom `Select-String`. Na druhej strane však vieme využiť operátor `-match` a jeho pokročilé vlastnosti. 
+----------------------------------------------------------
+V tejto úlohe nebudeme len zisťovať, či riadok súboru zodpovedá regulárnemu
+výrazu, ale budeme získavať časti riadka, ktoré vypíšeme.
 
-Powershell pošle výsledok zhody regulárneho výrazu so vstupom do špeciálnej premennej `$matches`, na ktorú sa môžeme odkázať v rúre. Premenná je typu pole, ktoré obsahuje na nultej pozícii podreťazec vyhovujúci regulárnemu výrazu.
+Doteraz sme totiž vždy vypisovali celé riadky, ktoré zodpovedali podmienke,
+ale v tomto prípade nás zaujíma len ich konkrétna časť.
 
-Výrazom `^[0-9]{4}` pokryjeme roky, teda štyri cifry na začiatku riadku. Rok na každom riadku sa objaví na nultom prvku premennej `$matches`, a pristúpime k nemu cez `$matches[0]`.
+Túto časť pokryjeme výrazom `^[0-9]{4}`, ktorým pokryjeme roky, teda štyri
+cifry na začiatku riadku.
+
+Cmdlet `Select-String` v skutočnosti posiela do rúry objekty typu
+`Microsoft.PowerShell.Commands.MatchInfo` reprezentujúce výsledky
+zhody reťazcov s regulárnym výrazom.
+
+Tento objekt má vlastnosť `Matches` reprezentujúcu pole všetkých zhôd
+(v našom prípade hľadáme len jednu zhodu). Toto pole zhôd môžeme
+iterovať pomocou cmdletu `For-Each`, zistiť z neho vlastnosť `Value`
+a tak získať celý výsledok:
 
 	Get-Content windows.txt | 
-		Where-Object { $_ -match "^[0-9]{4}" } | 
+		Select-String "^[0-9]{4}" |
+            ForEach-Object { $_.Matches.Value }		    
+
+Pozn.: hoci by sa zdalo, že výsledok získame cez `Select-Object`,
+nesmieme zabúdať, že tento cmdlet nepodporuje prístup k vnoreným vlastnostiam.
+
+### Alternatívne riešenie
+
+K vnoreným hodnotám môžeme pristúpiť aj dvojkombináciou `For-Each`:
+
+    Select-String "^\d{4}" | % Matches | % Value
+
+### Alternatívne riešenie
+
+Powershell dokáže poslať výsledok zhody regulárneho výrazu so vstupom do
+špeciálnej premennej `$matches`, na ktorú sa môžeme odkázať v rúre. Premenná je
+typu pole, ktoré obsahuje na nultej pozícii podreťazec vyhovujúci regulárnemu
+výrazu.
+
+Rok na každom riadku sa objaví na nultom prvku premennej `$matches`, a
+pristúpime k nemu cez `$matches[0]`.
+
+	Get-Content windows.txt | 
+		Where-Object { $_ -match "^\d{4}" } | 
 			ForEach-Object { $matches[0] }
 
-<div markdown="1" class="alternative-solution">
-V Powershelli 3.0 a novšom možno použiť aj vylepšený cmdlet `Select-String`, i keď s ťažkopádnejšou syntaxou.
-
-	Get-Content windows.txt | 
-		Select-String "^[0-9]{4}" | 
-			ForEach-Object { $_.matches.groups[0].value }
-
-V tomto prípade sa každý vyhovujúci riadok pretaví do objektu `MatchInfo`, kde z vlastnosti `matches.groups` na nultej pozícii vytiahneme príslušný vyhovujúci podreťazec.
-</div>
-
 Vypíšte len kódové označenia [escape a `$matches`]
----------------------------------
-V úlohe sú kódové označenia medzi hranatými zátvorkami. Prvý nápad pre výraz by znamenal ľubovoľný znak medzi zátvorkami, teda `[.+]`. To však nie je správne! Tento výraz totiž znamená sadu znakov obsahujúci bodku a plus, čo určite nemá zhodu so žiadnym riadkom súboru. 
+--------------------------------------------------
 
-V tomto prípade musíme znaky pre hranatú zátvorku *escape*núť, teda označiť ako doslovný znak zátvorky a nie indikátory sady znakov:
+V úlohe sú kódové označenia medzi hranatými zátvorkami. Prvý nápad pre výraz by
+znamenal ľubovoľný znak medzi zátvorkami, teda `[.+]`. To však nie je správne!
+Tento výraz totiž znamená sadu znakov obsahujúci bodku a plus, čo určite nemá
+zhodu so žiadnym riadkom súboru.
+
+V tomto prípade musíme znaky pre hranatú zátvorku *escape*núť, teda označiť ako
+doslovný znak zátvorky a nie indikátory sady znakov:
 
 	\[.*\]
 
 Výsledná rúra bude:
 
+    Get-Content windows.txt | 
+        Select-String "\[.*\]" | 
+            ForEach-Object { $_.Matches.Value }
+
+Výsledok však bude obsahovať aj samotné zátvorky.
+
+### Alternatívne riešenie
+
 	Get-Content windows.txt | 
 		Where-Object { $_ -match "\[.*\]" } | 
 			ForEach-Object { $matches[0] }
 
-Výsledok však bude obsahovať aj samotné zátvorky.
-
 Vypíšte len kódové označenia bez zátvoriek [skupiny a `$matches`]
----------------------------------
-Pri výpise kódových označení nechceme vidieť zátvorky. Ak si vnútro medzi zátvorkami označíme ako skupinu, budeme sa na ňu vedieť odkázať v premennej `$matches`. Na nultom indexe bude podreťazec, ktorý sa zhodol s regulárnym výrazom a na ďalších pozíciach sú zhody s jednotlivými skupinami v regulárnom výraze.
+-----------------------------------------------------------------
+
+Pri výpise kódových označení nechceme vidieť zátvorky. Ak si vnútro medzi
+zátvorkami označíme ako skupinu, získame možnosť získať jeho obsah.
 
 Vytvorme výraz pre vnútro kódového označenia operačného systému:
 
@@ -223,14 +342,34 @@ Vytvorme výraz pre vnútro kódového označenia operačného systému:
 *	nasleduje koncová zátvorka skupiny `)`
 *	nasleduje lomka a zátvorka reprezentujúca doslovný znak `]`.
 
-Obsah skupiny sa objaví v premennej `$matches` na prvej pozícii
+Výraz použijeme nasledovne:
+
+    Get-Content windows.txt | 
+        Select-String "\[.*\]" | 
+            ForEach-Object { $_.Matches.Groups[1].Value }
+
+Vlastnosť `Groups` reprezentuje pole skupín, ktoré sa naplnili pri
+nájdení zhody. V úspešnom prípade bude mať toto pole dva prvky. Na nultej
+pozícii sa nachádza celý reťazec, ktorý sa zhodol s regulárnym výrazom, a
+na ďalších pozíciach sú zhody s jednotlivými skupinami v regulárnom
+výraze.
+
+    Get-Content windows.txt | 
+        Select-String "\[(.*)\]" | 
+            ForEach-Object { $matches[0] }
+
+### Alternatívne riešenie
+
+Ak používame `Where-Object` a operátor `-match`, prvá skupina sa objaví
+v premennej `$matches[1]` na prvej pozícii. Nultá skupina, reprezentujúca
+podreťazec, ktorý sa zhodol s regulárnym výrazom, je v premennej `$matches[0]`.
 
 	Get-Content windows.txt | 
 		Where-Object { $_ -match "\[(.*)\]" } | 
 			ForEach-Object { $matches[1] }
 
 Vypíšte názvy Windowsov a roky vydania (`$matches`)
----
+---------------------------------------------------
 
 	Get-Content windows.txt | 
 		Where-Object { $_ -match "([0-9]{4}).*(Windows .*) \[" } | 
@@ -286,7 +425,7 @@ Všimnime si, že v každom riadku sa zjaví len posledný heštag! Problém je 
 
 	2003-04-24 Windows Server 2003 [Whistler Server] #win #win-nt #server
 
-tak najdhlšia možná zhoda pre výraz `(Windows .*) \[.*(#.*)$` a jej pažravosť sa prejaví v časti:
+tak najdlhšia možná zhoda pre výraz `(Windows .*) \[.*(#.*)$` a jej pažravosť sa prejaví v časti:
 
 	\[.*(#.*)$
 
