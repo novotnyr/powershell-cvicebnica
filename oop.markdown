@@ -47,6 +47,17 @@ V príklade sa do rúry pošlú objekty typu `Selected.System.Diagnostics.Proces
 
 Ako vybrať z objektu výhradne jednu vlastnosť?
 ----------------------------------------------
+### `ForEach-Object`
+
+Použime `ForEach-Object` s uvedením názvu vlastnosti
+
+	Get-ChildItem | ForEach-Object FullName
+
+Elegantné riešenie používa alias pre `ForEach-Object`
+
+	Get-ChildItem | % FullName
+
+### Bodkové notácie
 
 Použime `Select-Object` a parameter `-ExpandProperty`:
 
