@@ -4,7 +4,8 @@ layout: page
 ---
 
 WMI (Windows Management Instrumentation)
-=========================================
+========================================
+
 Zistite veľkosť RAMky v počítači
 --------------------------------
 
