@@ -18,13 +18,59 @@ Alebo:
 Vypíšte zoznam všetkých diskových jednotiek
 --------------------------------------------
 
-	Get-PSDrive | Where {$_.Provider -match "FileSystem"} | Select Root
+	Get-PSDrive | Where-Object Provider -match "FileSystem" | Select-Object Root
 
 alebo
 
-	gdr | ? {$_.Provider -match "FileSystem"} | Select Root
+	gdr | ? Provider -match filesystem | % root
 
-Problém v tomto prípade spočíva v tom, že sú zahrnuté aj vymeniteľné jednotky (DVD mechaniky), v ktorých sa nemusí nachádzať disk a teda prípadný výpis ich obsahu zlyhá.
+Problém v tomto prípade spočíva v tom, že sú zahrnuté aj vymeniteľné jednotky
+(DVD mechaniky), v ktorých sa nemusí nachádzať disk a teda prípadný výpis ich
+obsahu zlyhá.
+
+Zistite adresár, v ktorom sa nachádzajú položky Plochy.
+-------------------------------------------------------
+
+Informáciu možno získať z registrov z položky
+`HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders`,
+v kľúči `Desktop`.
+
+V PowerShelli pristúpime k hodnote cez providera pre registre. Registru
+`HKEY_CURRENT_USER` prislúcha jednotka (*drive*) `HKCU:`, ktorá
+obsahuje nastavenia špecifické pre konkrétneho používateľa.
+
+Ak chceme získať všetky páry hodnôt v kľúči `UserShellFolders` a z nich
+vytiahnuť konkrétnu hodnotu podľa mena, môžeme použiť:
+
+    Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders" | 
+        Select-Object "Common Desktop"
+
+Pomocou nástroja `regedit` overte, že sa naozaj v registroch nachádza.
+Položka je typu expandovateľný reťazec a premenná `%USERPROFILE%` sa
+automaticky expanduje na správnu hodnotu podľa aktuálne prihláseného
+používateľa.
+
+Cmdlet `Get-ItemProperty` umožňuje získavať hodnoty jednotlivých vlastností
+pre jednotlivé objekty. Na rozdiel od všeobecného `Select-Object` je
+tento cmdlet úzko zviazaný s konkrétnym providerom a jeho implementáciou.
+Dôležité je, že nie každý provider poskytuje možnosť získavať informácie
+cez tento cmdlet, ale typické providery ako `FileSystem`, či `Registry`
+ho podporujú.
+
+Výsledkom tohto cmdletu je objekt typu `System.Management.Automation.PSCustomObject`,
+kde sa každá hodnota v príslušnom kľúči objaví ako vlastnosť (property) objektu.
+
+### Alternatívne riešenie: skrátená verzia
+
+    gp "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders" | 
+        % "Common Desktop"
+
+### Alternatívne riešenie: objektovo-orientovaný prístup.
+
+Položky registrov sú typu `Microsoft.Win32.Registry`. Pomocou metódy
+`GetValue()` vieme získať príslušnú hodnotu podľa mena:
+
+	(Get-Item 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders').GetValue("Desktop")
 
 Vypíšte mená všetkých nainštalovaných fontov
 ---------------------------------------------
@@ -50,7 +96,7 @@ Ak chceme poslať názvy fontov do rúry, stačí rozbaliť pole:
 
     Get-Item "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts" | Select -ExpandProperty Property
 
-Alternatívne riešenie:
+### Alternatívne riešenie
 
 Keďže `Get-Item` posiela do rúry len jeden objekt, môžeme vytiahnuť jeho
 vlastnosť priamo. Do výsledku sa pošle pole názvov fontov, ktoré zotriedime:
@@ -60,41 +106,22 @@ vlastnosť priamo. Do výsledku sa pošle pole názvov fontov, ktoré zotriedime
 
 Vypíšte zoznam všetkých vyhľadávacích strojov v Internet Exploreri a URL adries, ktorými sa vyhľadáva
 ------------------------------------------------------------------------------------------------------
-Využijeme providera pre registre. "Jednotka" `HKCU:` zodpovedá registru
-`HKEY_CURRENT_USER`, teda nastaveniam špecifickým pre konkrétneho
-používateľa.
+Kľúč `HKEY_CURRENT_USER:\Software\Microsoft\Internet Explorer\SearchScopes`
+obsahuje podkľúče reprezentujúce jednotlivé vyhľadávacie stroje.
 
-Nastavenia pod konkrétnym kľúčom registra (*registry key*, čiže priečinok v registri)
-získame podobne ako pri výpise bežného adresára súborového systému a to
-cez `Get-ChildItem`.
+Stačí vypísať jeho "podsúbory" a pre každý z nich vytiahnuť príslušnú
+vlastnosť:
 
-Registre vracajú položku `RegistryKey`, čo je kvázi-mapa z kľúčov do
-hodnôt. Metódou `GetValue()` vieme získať hodnotu na základe daného
-kľúča.
-	
-	Get-ChildItem "HKCU:\Software\Microsoft\Internet Explorer\SearchScopes" | 
-	    ForEach-Object { $_.GetValue("DisplayName") + ": " + $_.GetValue("URL") }
-	
-Alternatívne:	
-	
-	ls "HKCU:\Software\Microsoft\Internet Explorer\SearchScopes" | 
-	    % { $_.GetValue("DisplayName") + ": " + $_.GetValue("URL") }
+    Get-ChildItem "HKCU:\Software\Microsoft\Internet Explorer\SearchScopes" |
+        Get-ItemProperty |
+            Select-Object DisplayName, URL
+            
+Skrátená verzia:
 
+    gci "HKCU:\Software\Microsoft\Internet Explorer\SearchScopes"
+        | gp
+            | select displayname, url                  
 
-
-Zistite adresár, v ktorom sa nachádzajú položky Plochy.
------------------------------------------------------------
-Informáciu možno získať z registrov z položky 
-`HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders`, 
-v kľúči `Desktop`. 
-
-	(Get-Item 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders').GetValue("Desktop")
-
-Pomocou nástroja `regedit` overte, že sa naozaj v registroch nachádza.
-Položka je typu expandovateľný reťazec a premenná `%USERPROFILE%` sa
-automaticky expanduje na správnu hodnotu podľa aktuálne prihláseného
-používateľa.
-	
 	
 Zistite, či je nastavená systémová premenná `JAVA_HOME` [premenné prostredia]
 -----------------------------------------------------------------------------
