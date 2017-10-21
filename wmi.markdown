@@ -104,23 +104,6 @@ Vypíšte zoznam všetkých MP3jek na všetkých lokálnych jednotkách
 	                Select-Object Name
 
 
-Zistite zoznam všetkého nainštalovaného softvéru od Adobe
--------------------------------------------
-	
-	Get-WmiObject Win32_Product | 
-	    Where-Object { $_.Caption -match "Adobe"} | 
-	        Sort-Object Caption | 
-	            Select-Object -ExpandProperty Caption
-
-Na niektorých inštaláciách Windows XP sa stretnete s chybou.
-
-Skrátený zápis:
-    
-    gwmi Win32_Product | 
-        ? { $_.Caption -match "Adobe" }
-            sort caption |
-                select -exp caption
-
 Zistite zoznam bežiacich procesov cez WMI
 -----------------------------------------
 
