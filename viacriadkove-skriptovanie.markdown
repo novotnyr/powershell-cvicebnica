@@ -91,13 +91,20 @@ Hláška je:
 
 Výraz `true` v Powershelli nie je definovaný. 
 
-Alternatívne:
+Korektné riešenie využíva premennu `$true`, ktorá obsahuje "pravdu".
+
+	while ($true) {
+	    "Budem si robiť domáce úlohy."
+	}
+
+Prirodzene, existuje aj opačná premenná `$false` reprezentujúca
+logické "nie".
+
+### Alternatíva: nenulové výrazy sú pravdivé
 
 	while (1) {
 	    "Budem si robiť domáce úlohy."
 	}
-
-Každý nenulový výraz sa vyhodnotí na booleovskú hodnotu `pravda`.
 
 Funkcie
 =======
