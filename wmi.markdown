@@ -86,7 +86,7 @@ Vypíšte zoznam všetkých logických jednotiek dostupných v systéme
 
 	Get-WmiObject Win32_LogicalDisk | Where-Object { $_.DriveType -eq 3 }
 
-Dokumentácia
+[Dokumentácia]
 (http://msdn.microsoft.com/en-us/library/aa394173(VS.85).aspx) udáva 3
 ako konštantu pre lokálnych jednotku.
 
@@ -151,7 +151,12 @@ alebo pretypovaním reťazca na objekt typu `[wmi]`:
 
 	[wmi] "Win32_Process.Handle = 0"
 
-Pozor, táto posledná finta funguje len pre niektoré vlastnosti. Z dokumentácie pre konkrétnu triedu zistite, ktoré vlastnosti majú kvalifikátor (*qualifier*) **Key**. Napríklad [`Win32_Process`]((http://msdn.microsoft.com/en-us/library/aa394372%28v=vs.85%29.aspx)) má len vlastnosti `CreationClassName` a `Handle`. Podrobnejšie vysvetlenie je na [MSDN Blogu](http://blogs.msdn.com/b/powershell/archive/2008/04/15/wmi-object-identifiers-and-keys.aspx).
+Pozor, táto posledná finta funguje len pre niektoré vlastnosti. Z dokumentácie
+pre konkrétnu triedu zistite, ktoré vlastnosti majú kvalifikátor
+(*qualifier*) **Key**. Napríklad
+[`Win32_Process`](http://msdn.microsoft.com/en-us/library/aa394372%28v=vs.85%29.aspx)
+má len vlastnosti `CreationClassName` a `Handle`. Podrobnejšie vysvetlenie
+je na [MSDN Blogu](http://blogs.msdn.com/b/powershell/archive/2008/04/15/wmi-object-identifiers-and-keys.aspx).
 
 Reštartujte počítač
 -------------------------------------------
