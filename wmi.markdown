@@ -49,7 +49,7 @@ Vypíšte názov implicitnej tlačiarne
 -------------------------------------------
 
 	Get-WmiObject Win32_Printer | 
-	    Where-Object { $_.Default } | 
+	    Where-Object Default | 
 	        Select-Object -ExpandProperty Name
 
 Zistite zoznam všetkých fyzických diskov pripojených k počítaču
@@ -68,14 +68,16 @@ Zistite zoznam fyzických diskov, ktoré podporujú technológiu SMART
 -------------------------------------------
 
 	Get-WmiObject Win32_DiskDrive | 
-	    Where-Object {$_.Capabilities -contains 10} | 
+	    Where-Object Capabilities -contains 10 | 
 	        Select-Object Caption
 
 Technológia SMART (Self-Monitoring, Analysis, and Reporting Technology)
 umožňuje monitorovanie a varovanie pred zlyhaním disku. Podporuje ju
 takmer každý dostupný pevný disk.
 
-Trieda [`Win32_DiskDrive`](http://msdn.microsoft.com/en-us/library/aa394132%28v=VS.85%29.aspx#properties) obsahuje vlastnosť `Capabilities` reprezentovanú poľom integerov. Ak pole obsahuje hodnotu 10, zariadenie podporuje SMART.
+Trieda [`Win32_DiskDrive`](http://msdn.microsoft.com/en-us/library/aa394132%28v=VS.85%29.aspx#properties)
+obsahuje vlastnosť `Capabilities` reprezentovanú poľom integerov. Ak pole
+obsahuje hodnotu 10, zariadenie podporuje SMART.
 
 Nájdite fyzický disk s najväčšou kapacitou.
 -------------------------------------------
@@ -89,7 +91,7 @@ Dôležitá vlastnosť je `Size`.
 Vypíšte zoznam všetkých logických jednotiek dostupných v systéme
 ----------------------------------------------------------------
 
-	Get-WmiObject Win32_LogicalDisk | Where-Object { $_.DriveType -eq 3 }
+	Get-WmiObject Win32_LogicalDisk | Where-Object DriveType -eq 3
 
 [Dokumentácia](http://msdn.microsoft.com/en-us/library/aa394173(VS.85).aspx) udáva 3
 ako konštantu pre lokálnu jednotku.
@@ -98,11 +100,10 @@ Vypíšte zoznam všetkých MP3jek na všetkých lokálnych jednotkách
 ---------------------------------------------------------------
 
 	Get-WmiObject Win32_LogicalDisk |  
-	    Where-Object { $_.DriveType -eq 3} | 
+	    Where-Object DriveType -eq 3 | 
 	        ForEach-Object { Get-Child-Item $_.Caption -Recurse } | 
 	            Where-Object { $_ .Extension -eq ".mp3" }  |
 	                Select-Object Name
-
 
 Zistite zoznam bežiacich procesov cez WMI
 -----------------------------------------
@@ -112,7 +113,7 @@ Zistite zoznam bežiacich procesov cez WMI
 
 Alternatívne cez dopyty v jazyku WQL ([WMI Query Language](http://msdn.microsoft.com/en-us/library/aa392902(v=vs.85).aspx)):
 
-	Get-WmiObject -Query 'select Name from Win32_Process'
+	Get-WmiObject -Query 'select ProcessId, Name, ExecutablePath from Win32_Process'
 
 WQL je podobný jazyku SQL. Názov triedy zodpovedá tabuľke, inštačné premenné stĺpcom.
 
