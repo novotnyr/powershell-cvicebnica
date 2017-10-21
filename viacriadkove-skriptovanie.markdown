@@ -65,8 +65,8 @@ predstavuje výraz, ktorý sa pošle do rúry a teda do výstupu.
 	    "Budem si robiť domáce úlohy."
 	}
 
-Vypíšte 10x text `Budem si robiť domáce úlohy.`, pričom použite `while
-----------------------------------------------------------------------
+Vypíšte 10x text `Budem si robiť domáce úlohy.` [cyklus `while`]
+----------------------------------------------------------------
 
 	$i = 0
 	while ($i -lt 10) {
@@ -227,7 +227,7 @@ Vo funkcii využijeme:
     použiť vo vnútri reťazca, nemusíme ich konkatenovať cez `+`. Dolárové
     premenné vo vnútri reťazcov sa automaticky nahradia ich hodnotami:
 
-	    "name = '$username'"
+        "name = '$username'"
 
     Pre `$username = "rn"` po interpolácii vznikne reťazec `"name =
     'rn'"`.
