@@ -550,8 +550,30 @@ Triedenie je potrebné, pretože bez nich `Get-Unique` nebude fungovať správne
             Sort-Object | 
                 | Get-Unique
 
+Spočítajte frekvencie prípon súborov v adresári [grouping, `Group-Object`]
+--------------------------------------------------------------------------
+Ak potrebujeme zoskupiť objekty do viacerých sád podľa rovnakej vlastnosti,
+môžeme použiť cmdlet `Group-Object`. V prvom riešení zistime, koľko
+súborov zdieľa spoločné prípony. Zoskupme teda súbory podľa prípony:
 
+    Get-ChildItem -Recurse | 
+        Group-Object Extension
 
+Výstupom bude:
 
+    Count Name      Group
+    ----- ----      -----
+       17 .html     {index.html, default.html, page.html, adresare.html...}
+       13 .markdown {adresare.markdown, dot-net.markdown...}
 
+Ak chceme vypísať len prípony a počty, prípadne ich usporiadať podľa
+frekvencie, stačí výsledok zotriediť a vybrať len príslušné vlastnosti:
 
+    Get-ChildItem -Recurse | 
+        Group-Object Extension | 
+            Sort-Object Count -Descending | 
+                Select-Object Name, Count
+
+### Alternatívne riešenie -- skrátený zápis
+
+    gci -r | group extension | sort count -desc | select name, count

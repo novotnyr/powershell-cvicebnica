@@ -99,44 +99,6 @@ Alternatívne:
 
 Každý nenulový výraz sa vyhodnotí na booleovskú hodnotu `pravda`.
 
-Spočítajte frekvencie prípon súborov v adresári
------------------------------------------------
-
-    $directory = D:\MP3
-	$extensionMap = @{}
-	Get-ChildItem $directory -Recurse | Where-Object {-not $_.PSContainer } |
-	    ForEach-Object { 
-	        if(! $extensionMap.containsKey($_.Extension)) {
-	            $extensionMap[$_.Extension] = 1
-	        } else {
-	            $extensionMap[$_.Extension]++
-	        }	        
-	    }
-	
-	$extensionMap
-
-Vo výsledku potrebujeme pre každý súbor evidovať dvojicu prípona-počet.
-Využime na to *hashovaciu tabuľku* (hash table), ktorá je v iných
-jazykoch známa aj ako *hash*, slovník (*dictionary*), či *hashmap*.
-
-Prázdnu hashovaciu tabuľku vytvoríme cez `@{}`, čím získame objekt typu
-`System.Collections.Hashtable`.
- 
-K jednotlivým prvkom pristúpime cez notáciu využívajúcu zátvorky
-`[...]`, podobne ako v prípade polí. 
-
-Existenciu kľúča v hashovacej tabuľke overíme cez metódu `containsKey()`.
-
-Spočítajte frekvencie prípon súborov v adresári [grouping]
-----------------------------------------------------------
-
-	Get-ChildItem -Recurse D:\MP3 | 
-	    Group-Object Extension | 
-	        Sort Count | 
-	            Format-Table Name, Count -AutoSize
-
-`Group-Object` dokáže zgrupovať veci do množín podľa rozličných kritérií.
-
 Funkcie
 =======
 
