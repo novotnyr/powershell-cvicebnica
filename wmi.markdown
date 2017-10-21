@@ -28,7 +28,8 @@ Výsledok bude:
 Zistite, koľko modulov RAM je v stroji
 --------------------------------------
 
-	Get-WmiObject Win32_PhysicalMemory | Format-Table -a BankLabel, Capacity
+	Get-WmiObject Win32_PhysicalMemory | 
+	    Select-Object BankLabel, Capacity
 
 Výsledok:
 
@@ -49,7 +50,7 @@ Vypíšte názov implicitnej tlačiarne
 
 	Get-WmiObject Win32_Printer | 
 	    Where-Object { $_.Default } | 
-	        Select -ExpandProperty Name
+	        Select-Object -ExpandProperty Name
 
 Zistite zoznam všetkých fyzických diskov pripojených k počítaču
 -------------------------------------------
@@ -66,7 +67,9 @@ Zistite zoznam všetkých vlastností / metód, ktoré možno zistiť o fyzický
 Zistite zoznam fyzických diskov, ktoré podporujú technológiu SMART
 -------------------------------------------
 
-	Get-WmiObject Win32_DiskDrive | Where-Object {$_.Capabilities -contains 10} | ft Caption
+	Get-WmiObject Win32_DiskDrive | 
+	    Where-Object {$_.Capabilities -contains 10} | 
+	        Select-Object Caption
 
 Technológia SMART (Self-Monitoring, Analysis, and Reporting Technology)
 umožňuje monitorovanie a varovanie pred zlyhaním disku. Podporuje ju
@@ -77,7 +80,9 @@ Trieda [`Win32_DiskDrive`](http://msdn.microsoft.com/en-us/library/aa394132%28v=
 Nájdite fyzický disk s najväčšou kapacitou.
 -------------------------------------------
 
-	Get-WmiObject Win32_DiskDrive | Sort-Object Size -Desc | Select -First 1
+	Get-WmiObject Win32_DiskDrive | 
+	    Sort-Object Size -Desc | 
+	        Select-Object -First 1
 
 Dôležitá vlastnosť je `Size`.
 
@@ -86,18 +91,17 @@ Vypíšte zoznam všetkých logických jednotiek dostupných v systéme
 
 	Get-WmiObject Win32_LogicalDisk | Where-Object { $_.DriveType -eq 3 }
 
-[Dokumentácia]
-(http://msdn.microsoft.com/en-us/library/aa394173(VS.85).aspx) udáva 3
-ako konštantu pre lokálnych jednotku.
+[Dokumentácia](http://msdn.microsoft.com/en-us/library/aa394173(VS.85).aspx) udáva 3
+ako konštantu pre lokálnu jednotku.
 
 Vypíšte zoznam všetkých MP3jek na všetkých lokálnych jednotkách
 ---------------------------------------------------------------
 
 	Get-WmiObject Win32_LogicalDisk |  
 	    Where-Object { $_.DriveType -eq 3} | 
-	    ForEach-Object { Get-Child-Item $_.Caption -Recurse } | 
-	    Where-Object { $_ .Extension -eq ".mp3" }  |
-	    Format-Table name
+	        ForEach-Object { Get-Child-Item $_.Caption -Recurse } | 
+	            Where-Object { $_ .Extension -eq ".mp3" }  |
+	                Select-Object Name
 
 
 Zistite zoznam všetkého nainštalovaného softvéru od Adobe
@@ -120,7 +124,8 @@ Skrátený zápis:
 Zistite zoznam bežiacich procesov cez WMI
 -----------------------------------------
 
-	Get-WmiObject Win32_Process | ft -a ProcessId, Name, ExecutablePath
+	Get-WmiObject Win32_Process |
+        Select-Object ProcessId, Name, ExecutablePath
 
 Alternatívne cez dopyty v jazyku WQL ([WMI Query Language](http://msdn.microsoft.com/en-us/library/aa392902(v=vs.85).aspx)):
 
