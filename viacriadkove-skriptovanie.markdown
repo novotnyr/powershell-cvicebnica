@@ -233,7 +233,7 @@ Vytvorte funkciu `Get-HomeDirectory`, ktorá vypíše domovský adresár použí
 
 	function Get-HomeDirectory {
 	    foreach($username in $input) {
-	        $sid = (gwmi Win32_UserProfile -filter "name = '$username'").sid
+	        $sid = (Get-WmiObject Win32_UserAccount -filter "name = '$username'").sid
 	        (Get-WmiObject Win32_UserProfile -filter "sid = '$sid'").LocalPath
 	    }
 	}
