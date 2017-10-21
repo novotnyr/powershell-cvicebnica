@@ -9,21 +9,22 @@ WMI (Windows Management Instrumentation)
 Zistite veľkosť RAMky v počítači
 --------------------------------
 
-	Get-WmiObject Win32_ComputerSystem
-
-Z vlastnosti `TotalPhysicalMemory` vidíme výsledok. Ak chceme len konkrétne číslo:
-
-	(Get-WmiObject Win32_ComputerSystem).TotalPhysicalMemory
+	Get-WmiObject Win32_ComputerSystem | Select-Object TotalPhysicalMemory
 
 WMI objekt sa tvári ako štandardný powershellovský objekt: má inštančné premenné a metódy.
+V tomto prípade vidíme výsledok vo vlastnosti `TotalPhysicalMemory`.
 
-Voliteľne môžeme zistiť aj gigabajty:
+### Alternatívne riešenie: gigabajty
 
 	(Get-WmiObject Win32_ComputerSystem).TotalPhysicalMemory / 1GB
 
 Výsledok bude:
 
 	7,88347625732422
+
+### Alternatívne riešenie: skrátený zápis
+
+    gwmi Win32_ComputerSystem | % TotalPhysicalMemory
 
 Zistite, koľko modulov RAM je v stroji
 --------------------------------------
@@ -41,31 +42,31 @@ Výsledok:
 Máme teda 2 moduly po 4GB.
 
 Vypíšte zoznam všetkých tlačiarní pripojených k počítaču
--------------------------------------------
+--------------------------------------------------------
 
 	Get-WmiObject Win32_Printer
 
 Vypíšte názov implicitnej tlačiarne
--------------------------------------------
+-----------------------------------
 
 	Get-WmiObject Win32_Printer | 
 	    Where-Object Default | 
 	        Select-Object -ExpandProperty Name
 
 Zistite zoznam všetkých fyzických diskov pripojených k počítaču
--------------------------------------------
+---------------------------------------------------------------
 	
 	Get-WmiObject Win32_DiskDrive
 
 `Win32_DiskDrive` je trieda zodpovedajúca fyzickému disku vo Windowse.
 
 Zistite zoznam všetkých vlastností / metód, ktoré možno zistiť o fyzických diskoch.
--------------------------------------------
+-----------------------------------------------------------------------------------
 
 	Get-WmiObject Win32_DiskDrive | Get-Member
 
 Zistite zoznam fyzických diskov, ktoré podporujú technológiu SMART
--------------------------------------------
+------------------------------------------------------------------
 
 	Get-WmiObject Win32_DiskDrive | 
 	    Where-Object Capabilities -contains 10 | 
@@ -128,7 +129,7 @@ Alternatívne cez pretypovanie reťazca na objekt typu `wmisearcher`:
 	$q.get()
 
 Zistite info o procese s ID 0
-------------------------------
+-----------------------------
 
 	Get-WmiObject -Query "SELECT * FROM Win32_Process WHERE Handle = 0"
 
@@ -148,7 +149,7 @@ má len vlastnosti `CreationClassName` a `Handle`. Podrobnejšie vysvetlenie
 je na [MSDN Blogu](http://blogs.msdn.com/b/powershell/archive/2008/04/15/wmi-object-identifiers-and-keys.aspx).
 
 Reštartujte počítač
--------------------------------------------
+-------------------
 	
 	(Get-WmiObject Win32_OperatingSystem).Reboot()
 
