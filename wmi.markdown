@@ -177,11 +177,11 @@ Bežná kombinácia `Get-WmiObject` a výberu s filtráciou:
 
 Výber pomocou dopytu jazyka *WMI Query Language*:
 
-    Get-WmiObject -Query "SELECT Name FROM Win32_Process WHERE Name = 'powershell.exe'"
+    Get-WmiObject Win32_Process -Query "SELECT Name FROM Win32_Process WHERE Name = 'powershell.exe'"
 
 Dopytovanie s filtráciou:
 
-    Get-WmiObject -Filter "Name = 'powershell.exe'"
+    Get-WmiObject Win32_Process -Filter "Name = 'powershell.exe'"
 
 Dopytovanie s pretypovaním reťazca na `wmisearcher`:
 
@@ -190,4 +190,4 @@ Dopytovanie s pretypovaním reťazca na `wmisearcher`:
 
 Vyhľadávanie podľa primárneho kľúča (*key*):
 
-   [wmi] "Win32_Process.Handle = 0"
+    [wmi] "Win32_Process.Handle = 0"
