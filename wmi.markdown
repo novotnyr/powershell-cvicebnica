@@ -159,3 +159,28 @@ Reštartujte počítač [`Restart-Computer`]
 ----------------------------------------
 
 	Restart-Computer
+
+WMI ťahák
+---------
+Bežná kombinácia `Get-WmiObject` a výberu s filtráciou:
+
+	Get-WmiObject Win32_Process |
+            Select-Object ProcessId, Name, ExecutablePath |
+                Where-Object Name -eq powershell.exe
+
+Výber pomocou dopytu jazyka *WMI Query Language*:
+
+    Get-WmiObject -Query "SELECT Name FROM Win32_Process WHERE Name = 'powershell.exe'"
+
+Dopytovanie s filtráciou:
+
+    Get-WmiObject -Filter "Name = 'powershell.exe'"
+
+Dopytovanie s pretypovaním reťazca na `wmisearcher`:
+
+    $wmi = [wmisearcher] "SELECT Name FROM Win32_Process WHERE Name = 'powershell.exe'"
+    $wmi.get()    
+
+Vyhľadávanie podľa primárneho kľúča (*key*):
+
+   [wmi] "Win32_Process.Handle = 0"
