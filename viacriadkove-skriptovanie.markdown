@@ -109,101 +109,6 @@ logické "nie".
 Funkcie
 =======
 
-Vytvorte funkciu `Get-Hello`, ktorá vypíše 10x "Hello World"
-----------------------------------------------------------
-
-	function Get-Hello {
-		1..10 | % { "Hello World" }
-	}
-
-Funkciu zavoláme cez
-
-	Get-Hello
-
-Funkcie sa majú tváriť ako cmdlety a teda by mali dodržiavať konvenciu
- *sloveso*-*podstatné meno*.
-
-Vytvorte funkciu `Get-Hello`, ktorá vypíše zadaný počet krát "Hello World"
---------------------------------------------------------------------------
-
-	function Get-Hello($count) {
-		1..$count | % { "Hello World" }
-	}
-	
-	Get-Hello 3
-
-Vytvorte funkciu `Get-Hello`, ktorá vypíše zadaný počet krát "Hello World" [implicitné parametre]
--------------------------------------------------------------------------------------------------
-
-Pri parametroch je často vhodné uviesť implicitnú hodnotu. Ak totiž zavoláme len
-
-	Get-Hello
-
-Uvidíme výpis:
-
-	Hello World
-	Hello World
-
-Funkcia totiž bude iterovať od 1..0, čiže dvakrát. Upravme hlavičku
-funkcie:
-
-	function Get-Hello($count=1) {
-		1..$count | % { "Hello World" }
-	}
-
-Vytvorte funkciu `Write-RepeatedMessage`, ktorá vypíše zadaný počet krát text
---------------------------------------------------------------------------
-
-	function Write-RepeatedMessage($message, $count = 1) {
-		1..$count | % { $message }
-	}
-
-Pozor na syntax volania! 
-
-Správny spôsob volania je bezzátvorkový:
-
-	Write-RepeatedMessage "Hello World" 2
-
-Zvyklosti z iných jazykov nefungujú:
-
-	Write-RepeatedMessage("Hello World", 2)
-
-Vypíše totiž:
-
-	Hello World
-	2
-
-Toto nefunguje! Funkcie sa majú tváriť ako cmdlety, preto žiadne
-zátvorkové volanie nefunguje. Toto nesprávne volanie zavolá funkciu s
-jedným parametrom typu *dvojprvkové pole*. PowerShell ho vypíše raz a
-keďže polia sa transformujú na jednotlivé prvky poslané do rúry, uvidíme
-presne tento výpis.
-
-Skúste si to napríklad s 
-
-	Write-RepeatedMessage("Hello World", 2, "Ding", "Dong")
-
-Zlepšite správanie funkcie dodaním dátových typov
--------------------------------------------------
-
-	function Write-RepeatedMessage([string] $message, [int] $count = 1) {
-		1..$count | % { $message }
-	}
-
-Ak zavoláte 
-	
-	Write-RepeatedMessage 2 2
-	
-uvidíte chybu.
-
-Opäť pozor na bezzátvorkové správanie!
-	
-	Write-RepeatedMessage("Hello World", 2)
-
-Výpis bude:
-
-	Hello World 2
-
 Vytvorte funkciu, ktorá vygeneruje náhodný znak
 -----------------------------------------------
 
@@ -211,10 +116,30 @@ Vytvorte funkciu, ktorá vygeneruje náhodný znak
         Get-Random -Min 97 -Max 122 | ForEach-Object { [char] $PSItem }
     }
 
+Funkciu použijeme v ďalšom kroku na generovanie hesla.
+
+Funkcie sa majú tváriť ako cmdlety a teda by mali dodržiavať konvenciu
+ *sloveso*-*podstatné meno*.
+
 Cmdlet `Get-Random` dokáže generovať náhodné číslo v zadanom intervale.
 Ak využijeme vlastnosti ASCII tabuľky, vieme, že písmená od `a` po `z`
 majú ASCII kód od 97 do 122. Zmenu náhodného čísla na znak urobíme
 tvrdým pretypovaním čísla (*int*) na znak (*char*).
+
+### Alternatívne riešenie: pretypovanie výsledku
+
+    function Get-RandomChar {
+        [char] (Get-Random -Min 97 -Max 122)
+    }
+
+Zavolajte funkciu generujúcu náhodný znak
+-----------------------------------------
+
+    Get-RandomChar
+
+Na rozdiel od iných programovacích jazykov sa za názov funkcie nepíšu
+zátvorky. Nezabudnime, že funkcie sa majú tváriť ako cmdlety, v ktorých
+sa zátvorky takisto nepíšu.
 
 Vytvorte funkciu, ktorá vygeneruje náhodné heslo dĺžky 10 znakov
 ----------------------------------------------------------------
@@ -254,7 +179,54 @@ môžeme vybrať zo vstupu náhodných 10 čísiel, ktoré potom prevedieme
 na znaky. V úplnom závere všetky znaky zlepíme do reťazca pomocou operátora
 `-join`.
 
+Vytvorte funkciu, ktorá vygeneruje náhodné heslo dĺžky *n* znakov
+-----------------------------------------------------------------
 
+    function Get-RandomPassword($length) {
+        1..$length |
+            ForEach-Object { Get-RandomChar } |
+                Write-Host -NoNewLine
+    }
+
+Parametre funkcie uvedieme do zátvoriek, pričom ich uvádzame s dolárom
+(sú to koniec-koncov premenné). Dátové typy nie sú povinné.
+
+Pozor na syntax volania! Správny spôsob volania je bezzátvorkový:
+
+    Get-RandomPassword 15
+
+<div class="note" markdown="1">
+Funkcie sa majú tváriť ako cmdlety, čo je dôvod, prečo sa neuvádzajú
+ich parametre do zátvoriek!
+</div>
+
+Zavolajte funkciu `Get-RandomPassword` bez parametra
+----------------------------------------------------
+
+    Get-RandomPassword
+
+Výsledkom bude dvojznakové heslo, čo je zvláštna vec!
+
+<div class="note" markdown="1">
+Ak vynecháme parameter, vnútro funkcie bude volať interval od 1 po prázdny
+obsah, teda dvakrát. Je to nečakaná vec!
+</div>
+
+Obohaťme funkciu `Get-RandomPassword` o dátové typy
+---------------------------------------------------
+
+    function Get-RandomPassword([int] $length = 10) {
+        1..$length |
+            ForEach-Object { Get-RandomChar } |
+                Write-Host -NoNewLine
+    }
+
+Parameter môže mať dátový typ "celé číslo" (`int`) a môže mať implicitnú
+hodnotu, napr. desať:
+
+    [int] $length = 10
+
+Ak parameter vynecháme, vygeneruje sa desaťznakové heslo.
 
 Vytvorte funkciu `Get-HomeDirectory`, ktorá pre zadaného používateľa vráti jeho domovský adresár
 ------------------------------------------------------------------------------------------------
@@ -406,3 +378,16 @@ univerzálny objekt, ktorý vieme vytvoriť a ktorému vieme priradiť nové
 vlastnosti (properties). Následne vieme objekt obohacovať o hodnoty cez
 bodkové notácie.
 
+Vytvorte funkciu, ktorá vygeneruje náhodné heslá pre zoznam používateľov
+------------------------------------------------------------------------
+
+    filter Get-RandomCredentials([int] $length = 10) {
+      $credentials = New-Object PSObject | Select-Object Name, Password
+      $credentials.Name = $_
+      $credentials.Password = Get-RandomPassword $length
+      $credentials
+    }
+
+Použitie funkcie:
+
+    "novotnyr", "root" | Get-RandomCredentials
