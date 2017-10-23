@@ -204,6 +204,58 @@ Výpis bude:
 
 	Hello World 2
 
+Vytvorte funkciu, ktorá vygeneruje náhodný znak
+-----------------------------------------------
+
+    function Get-RandomChar {
+        Get-Random -Min 97 -Max 122 | ForEach-Object { [char] $PSItem }
+    }
+
+Cmdlet `Get-Random` dokáže generovať náhodné číslo v zadanom intervale.
+Ak využijeme vlastnosti ASCII tabuľky, vieme, že písmená od `a` po `z`
+majú ASCII kód od 97 do 122. Zmenu náhodného čísla na znak urobíme
+tvrdým pretypovaním čísla (*int*) na znak (*char*).
+
+Vytvorte funkciu, ktorá vygeneruje náhodné heslo dĺžky 10 znakov
+----------------------------------------------------------------
+
+    function Get-RandomString {
+        1..10 |
+            ForEach-Object { Get-RandomChar } |
+                Write-Host -NoNewLine
+    }
+
+Vo funkcii desaťkrát zavoláme pomocnú funkciu `Get-RandomChar`. Výsledkom
+bude desať náhodných znakov, ktoré zlepíme (skonkatenujeme) do jedného
+reťazca pomocou cmdletu `Write-Host`, v ktorom pomocou parametra
+`-NoNewLine` zabránime vypisovaniu znaku konca riadka medzi jednotlivými
+znakmi padajúcimi z rúry.
+
+### Alternatívne riešenie: použitie `-join`
+
+    function Get-RandomString {
+        -join ( 1..10 | ForEach-Object { Get-RandomChar } )
+    }
+
+Operátor `-join` umožňuje spájať reťazce z poľa, či rúry. Jeho parameter
+uzavrieme do zátvoriek, čo znamená, že všetky náhodné znaky z rúry
+spojí do jedného reťazca
+
+### Alternatívne riešenie: výber viacerých náhodných prvkov [`Get-Random`]
+
+    function Get-RandomString {
+        -join ( 97..122 | Get-Random -Count 10 | % { [char] $_ } )
+    }
+
+Najprv vygenerujeme zoznam čísiel reprezentujúcich znaky medzi `a` a `z`, teda
+s ASCII kódmi medzi 97..122. Cmdlet `Get-Random` má možnosť zopakovať
+náhodný výber zo sady objektov na vstupe. Použitím parametra `-Count`
+môžeme vybrať zo vstupu náhodných 10 čísiel, ktoré potom prevedieme
+na znaky. V úplnom závere všetky znaky zlepíme do reťazca pomocou operátora
+`-join`.
+
+
+
 Vytvorte funkciu `Get-HomeDirectory`, ktorá pre zadaného používateľa vráti jeho domovský adresár
 ------------------------------------------------------------------------------------------------
 
