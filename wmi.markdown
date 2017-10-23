@@ -128,7 +128,8 @@ WQL je podobný jazyku SQL. Názov triedy zodpovedá tabuľke, inštačné preme
 Zistite zoznam bežiacich procesov z `C:\Windows`
 ------------------------------------------------
 
-	Get-WmiObject -Query 'select Name from Win32_Process where ExecutablePath like "%C:\\Windows%"'
+	Get-WmiObject -Query `
+	    'select Name from Win32_Process where ExecutablePath like "%C:\\Windows%"'
 
 Alternatívne cez pretypovanie reťazca na objekt typu `wmisearcher`:
 
@@ -177,7 +178,8 @@ Bežná kombinácia `Get-WmiObject` a výberu s filtráciou:
 
 Výber pomocou dopytu jazyka *WMI Query Language*:
 
-    Get-WmiObject Win32_Process -Query "SELECT Name FROM Win32_Process WHERE Name = 'powershell.exe'"
+    Get-WmiObject Win32_Process `
+        -Query "SELECT Name FROM Win32_Process WHERE Name = 'powershell.exe'"
 
 Dopytovanie s filtráciou:
 
