@@ -102,9 +102,16 @@ Vypíšte zoznam všetkých MP3jek na všetkých lokálnych jednotkách
 
 	Get-WmiObject Win32_LogicalDisk |  
 	    Where-Object DriveType -eq 3 | 
-	        ForEach-Object { Get-Child-Item $_.Caption -Recurse } | 
-	            Where-Object { $_ .Extension -eq ".mp3" }  |
+	        ForEach-Object { Get-ChildItem $_.Caption -Recurse } | 
+	            Where-Object Extension -eq ".mp3" |
 	                Select-Object Name
+
+### Alternatívne riešenie: skrátený zápis
+
+    gwmi Win32_LogicalDisk | ? DriveType -eq 3 |
+        % { gci $_.Caption -r } |
+            ? Extension -eq ".mp3" |
+                % Name	                
 
 Zistite zoznam bežiacich procesov cez WMI
 -----------------------------------------
