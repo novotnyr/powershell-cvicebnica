@@ -6,8 +6,8 @@ layout: page
 Služby
 ======
 
-Vypíšte zoznam všetkých služieb vo Windowse.
---------------------------------------------
+Vypíšte zoznam všetkých služieb vo Windowse
+-------------------------------------------
 
 	Get-Service
 
@@ -15,13 +15,17 @@ Alias:
 
 	gsv
 
-Vypíšte zoznam všetkých bežiacich služieb.
--------------------------------------------
+Vypíšte zoznam všetkých bežiacich služieb
+-----------------------------------------
 
-	Get-Service | Where-Object { $_.Status -eq "Running" }
+	Get-Service | Where-Object Status -eq Running
 
-Zastavte službu s názvom Themes.
---------------------------------
+Služba je reprezentovaná objektami typu `System.ServiceProcess.ServiceController`,
+ktoré majú vlastnosť `Status`. Bežiace služby majú hodnotu tejto vlastnosti
+rovnú `Running`.
+
+Zastavte službu s názvom Themes
+-------------------------------
 
 	Stop-Service Themes
 
@@ -29,8 +33,8 @@ alebo dlhšie, ale v súlade s filozofiou `ps`/`kill`:
 
 	Get-Service Themes | Stop-Service
 
-Znovu spustite službu s názvom Themes.
--------------------------------------------
+Znovu spustite službu s názvom Themes
+-------------------------------------
 
 	Start-Service Themes
 
@@ -47,8 +51,8 @@ alebo
 
 	gsv | gm
 
-Vypíšte služby spolu so závislými službami.
--------------------------------------------
+Vypíšte služby spolu so závislými službami
+------------------------------------------
 
 	Get-Service | ft Name, ServicesDependedOn –a
 

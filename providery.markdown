@@ -18,15 +18,31 @@ Alebo:
 Vypíšte zoznam všetkých diskových jednotiek
 --------------------------------------------
 
-	Get-PSDrive | Where-Object Provider -match "FileSystem" | Select-Object Root
+	Get-PSDrive
+	    | Where-Object Provider -match "FileSystem" 
+	        | Select-Object Root
 
 alebo
 
-	gdr | ? Provider -match filesystem | % root
+	gdr | ? provider -match filesystem | % root
 
 Problém v tomto prípade spočíva v tom, že sú zahrnuté aj vymeniteľné jednotky
 (DVD mechaniky), v ktorých sa nemusí nachádzať disk a teda prípadný výpis ich
 obsahu zlyhá.
+
+<div class="note" markdown="1">
+V cmdlete sme na filtrovanie použili `-match`. V tomto prípade
+by nefungovala presná zhoda reťazca `FileSystem` s hodnotou vlastnosti `Provider`, pretože
+skutočná hodnota tejto vlastnosti sa odlišuje od zobrazovanej hodnoty.
+
+Powershell zobrazuje len zjednodušenú verziu vlastnosti `Provider`, ktorej
+skutočná hodnota je napr. `Microsoft.PowerShell.Core\FileSystem`.
+
+Tento fakt sme zistili pomocou príkazu:
+
+    Get-PSDrive | Select Provider
+
+</div>
 
 Zistite adresár, v ktorom sa nachádzajú položky Plochy.
 -------------------------------------------------------
@@ -123,24 +139,33 @@ Skrátená verzia:
             | select displayname, url                  
 
 	
-Zistite, či je nastavená systémová premenná `JAVA_HOME` [premenné prostredia]
+Zistite, či je nastavená systémová premenná `JAVA_HOME`
 -----------------------------------------------------------------------------
+
+### Priamy prístup k premennej prostredia
+
+    $Env:JAVA_HOME
+
+Powershell používa na premenné prostredia špeciálnu predponu premenných: `Env:`.
+Ak premenná neexistuje, nevráti sa nič.
+
+### Prístup cez providera `Env:`s
+
 Provider `Env:` slúži na premenné prostredia.
 
     Get-ChildItem Env:\JAVA_HOME | Select-Object Value 
 
 Alternatívne:
 
-	dir Env:\JAVA_HOME | select value
+	gci Env:\JAVA_HOME | % value
 
-Zistite, či je nastavená systémová premenná `JAVA_HOME` [registre]
-------------------------------------------------------------------
+Nastavte `JAVA_HOME` pre všetkých používateľov na `C:\java\jdk8` [`Set-Item-Property`]
+--------------------------------------------------------------------------------------
 
-	(Get-Item "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Environment")
-	    .GetValue("JAVA_HOME")
+    Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" JAVA_HOME C:\java\jdk8
 
-Nastavte `JAVA_HOME` pre všetkých používateľov na `C:\java\jdk6`.
-----------------------------------------------------------------
- 
-	(Get-Item "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Environment")
-	    .SetValue("JAVA_HOME", "C:\Java\JDK")
+Cmdlet `Set-ItemProperty` umožňuje nastaviť vlastnosť konkrétnemu objektu,
+ktorý je pod správou providera. V našom prípade umožňuje nastaviť kľúče
+a hodnoty pre položky registra.
+
+![Nová nastavená položka](powershell-registry.png)

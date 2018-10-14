@@ -217,45 +217,31 @@ Parametre možno skracovať, kým nedôjde k nejednoznačnosti:
 
 Vypíšte všetky XML súbory v domovskom adresári a vo všetkých jeho podadresároch.
 --------------------------------------------------------------------------------
-Pozor! Linuxáci skúsia použiť:
-
-	ls ~ *.xml –r # nefunguje!
-
-Prvým nepomenovaným argumentom musí byť aktuálny adresár, druhým je filter. Korektný príkaz je 
-
-	Get-ChildItem ~ *.xml -Recurse
-
-čo je skrátenina pre
 
 	Get-ChildItem -Path . -Filter *.xml -Recurse 
 
-Správna linuxácka skrátená verzia je:
+### Skrátený zápis
 
-	ls ~ *.xml –r
-
-Prvý parameter je bodka indikujúca aktuálny adresár, druhý parameter je filter pre XML súbory.
+	Get-ChildItem ~ *.xml -Recurse
 
 <div class="note" markdown="1">
-Pozrime si pomocníka k príkazu `Get-ChildItem`:
+Všimnime si [dokumentáciu](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-childitem), získanú napr. cez `Get-Help Get-ChildItem`:
 
-    Get-Help Get-ChildItem
-    
-Výsledkom bude:
-    
-    NAME
-        Get-ChildItem
-    
-    SYNOPSIS
-        Gets the items and child items in one or more specified locations.
-    
-    
-    SYNTAX
-        Get-ChildItem [[-Path] <string[]>] [[-Filter] <string>] [-Exclude <string[]>] [-Force] [-Include <string[]>] [-Name
-        ] [-Recurse] [-UseTransaction] [<CommonParameters>]
-        
-Vidno, že najprv musíme uviesť parameter s cestou (`-Path`) a za ním
-filter (`-Filter`).
+    Get-ChildItem
+       [[-Path] <String[]>]
+       [[-Filter] <String>]
+       ...
+       [-Recurse]
+       ...
+
+Prvé dva argumenty sú *pozičné*, teda nemusia mať svoj názov. Prvým
+pozičným argumentom je adresár, v ktorom sa vypisujú súbory, a druhým
+pozičným argumentom je filter.
 </div>
+
+### Alternatívne riešenie: linuxovské aliasy
+
+	ls ~ *.xml –r
 
 Vypíšte len plochý zoznam súborov z predošlej úlohy
 ---------------------------------------------------
@@ -288,6 +274,8 @@ Vystavajme rúru a výsledok z `Get-ChildItem` pošlime do cmdletu `Measure-Obje
 vie robiť štatistické výpočty.
 
 Vo výslednej položke `Count` nájdeme výsledok.
+
+### Alternatívne riešenie: skrátené zápisy
 
 Cmdlet `Measure-Object` má alias `Measure`:
 
@@ -348,12 +336,12 @@ Vypíšte len súbory zotriedené podľa veľkosti
 Cmdlet `Sort-Object` má parameter, v ktorom určíme vlastnosť, podľa ktorého sa
 má triediť. Triedime podľa veľkosti (`length`).
 
-Skrátený alias:
+### Alternatívne riešenie: alias `sort`
 
 	ls -file | sort length
 
-Vypíšte súbory a adresáre zotriedené podľa veľkosti zostupne.
--------------------------------------------------------------
+Vypíšte súbory a adresáre zotriedené podľa veľkosti zostupne
+------------------------------------------------------------
 
 	Get-ChildItem | Sort-Object -Property Length -Descending
 
@@ -479,6 +467,8 @@ s obskúrnym názvom.
 Powershell umožňuje definovať veľkosti v čitateľnom tvare. Hodnota `20 MB`
 sa automaticky prepočíta na správnu veľkosť `20971520` bajtov.
 
+### Alternatívne riešenie: alias `Where` a `?`
+
 Cmdlet má skrátený zápis cez `Where` alebo cez úplne jednoduchý otáznik:
 
 	ls -r | ? length -ge 20MB | select FullName
@@ -518,6 +508,11 @@ použiť aj alternatívny názov `$PSItem`.
 V príklade overujeme vlastnosť `LastWriteTime.Year`, ktorú porovnávame
 s príslušnou hodnotou.
 
+<div class="note" markdown="1">
+V starších skriptoch možno vidieť aj alternatívnu premennú `$PSItem`.
+Má rovnakú hodnotu ako `$_`.
+</div>
+
 Nájdite plné cesty k všetkým súborom z roku 2015, ktoré sú menšie ako 1 GB [`Where-Object`]
 -------------------------------------------------------------------------------------------
 
@@ -530,16 +525,11 @@ cez operátor `-and` reprezentujúci logické "a zároveň":
 Všimnime si, že pýtame sa na dve vlastnosti objektu, ktorý je reprezentovaný
 premennou `$_`: a to rok posledného zápisu a dĺžku.
 
-Alternatívny zápis používa premennú `$PSItem`:
-
-    Get-ChildItem | 
-        Where-Object { $PSItem.LastWriteTime.Year -eq 2015 -and $PSItem.Length -le 1GB }
-
-Vypíšte všetky adresáre, ktoré obsahujú aspoň jednu MP3ku [`ForEach-Object`]
-----------------------------------------------------------------------------
+Vypíšte všetky adresáre, ktoré obsahujú aspoň jednu MP3ku [`Sort-Object` a `Get-Unique`]
+----------------------------------------------------------------------------------------
 
 Najprv získame zoznam všetkých MP3 súborov. Následne pre každý súbor získame názov
-nadradeného adresára a pošleme ho ďalej dú rúry. Aby sme predišli
+nadradeného adresára a pošleme ho ďalej do rúry. Aby sme predišli
 opakovaným výskytom, adresáre zotriedime (`Sort-Object`), aby sme ich
 mohli prehnať cez `Get-Unique`, ktorý vyhodí duplicitné riadky.
 

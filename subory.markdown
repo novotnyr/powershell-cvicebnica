@@ -8,10 +8,6 @@ Súbory
 Vytvorte v domovskom adresári súbor `ahoj.txt` s obsahom `AHOJ`
 ---------------------------------------------------------------
 
-	echo "Ahoj" > ahoj.txt
-
-Toto je klasická finta známa ešte z čias MS-DOSu (a fungujúca aj na Linuxe).
-
 Vytvorte v domovskom adresári súbor `ahoj.txt` s obsahom `AHOJ` [`Set-Content`]
 -------------------------------------------------------------------------------
 Pošlime do rúry reťazec, ktorý zapíšeme do súboru pomocou cmdletu
@@ -23,8 +19,16 @@ Cmdlet `Set-Content` má alias:
 
 	"AHOJ" | sc ahoj.txt
 
+### Alternatívne riešenie: `echo` a presmerovanie
+
+	echo "Ahoj" > ahoj.txt
+
+Toto je klasická finta známa ešte z čias MS-DOSu (a fungujúca aj na Linuxe).
+Operátor `>` presmeruje výstup príkazu do súboru.
+
 Vypíšte obsah súboru `ahoj.txt` [`Get-Content`]
 -----------------------------------------------
+
 	Get-Content ahoj.txt 
 
 Cmdlet `Get-Content` načíta súbor a každý riadok pošle do rúry. Ak na

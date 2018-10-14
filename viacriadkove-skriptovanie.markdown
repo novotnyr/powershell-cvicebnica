@@ -15,7 +15,7 @@ Overte správanie pri otváraní uložených skriptov
 ------------------------------------------------
 Otvorenie existujúcich skriptov spôsobí problémy pri spúšťaní.
 
-	File C:\Users\novotnyr\hello.ps1 cannot be loaded because the execution of scripts is  disabled on this system. Please see "get-help about_signing" for more details.
+	File C:\Users\novotnyr\hello.ps1 cannot be loaded because the execution of scripts is disabled on this system. Please see "get-help about_signing" for more details.
 	At line:0 char:0
 
 Zmeniť možno politiku vykonávania skriptov
