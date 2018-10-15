@@ -46,6 +46,43 @@ Overte dátový typ premennej `$cena`
 
 Dátové typy využívajú objektový model z .NET Frameworku.
 
+Z URL adresy zistite názov servera [`New-Object`]
+-------------------------------------------------
+
+    $uri = New-Object Uri "http://google.com"
+    $uri.Host
+
+Cmdlet `New-Object` vie vytvoriť ľubovoľnú inštanciu
+objektu z frameworku `.NET`. V tomto prípade vytvoríme
+nový objekt typu `System.Uri`. Následne získame jeho vlastnosť `Host`.
+
+Zistite cestu k priečinku Plochy (Desktop) [objekty COM]
+--------------------------------------------------------
+
+    $WshShell = New-Object -ComObject WScript.Shell
+    $WshShell.SpecialFolders.Item("Desktop")
+
+Trieda `WScript.Shell` z frameworku COM reprezentuje používateľské prostredie.
+Vlastnosť `SpecialFolder` obsahuje lokácie typických priečinkov, napr.
+cestu k ploche.
+
+Parameter `-ComObject` indikuje vytvorenie COM objektu,
+pretože štandardne sa vytvárajú .NET objekty.
+
+<div class="note" markdown="1">
+Objektový model COM (Component Object Model) je vo Windowse prítomný
+od dávnych čias, a definuje samostatnú sadu komponentov, ktorá dopĺňa
+funkcionalitu frameworku .NET.
+</div>
+
+Vypočítajte druhú odmocninu z 25
+--------------------------------
+
+	[Math]::Sqrt(25)
+
+Použime statickú metódu `Sqrt()` na objekte `System.Math`.
+
+
 Vypíšte 10x text `Budem si robiť domáce úlohy.`
 ------------------------------------------------------------
 
