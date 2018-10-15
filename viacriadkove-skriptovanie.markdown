@@ -145,16 +145,13 @@ Vytvorte funkciu, ktorá vygeneruje náhodné heslo dĺžky 10 znakov
 ----------------------------------------------------------------
 
     function Get-RandomString {
-        1..10 |
-            ForEach-Object { Get-RandomChar } |
-                Write-Host -NoNewLine
+        ( 1..10 | ForEach-Object { Get-RandomChar } ) -join ""
     }
 
-Vo funkcii desaťkrát zavoláme pomocnú funkciu `Get-RandomChar`. Výsledkom
-bude desať náhodných znakov, ktoré zlepíme (skonkatenujeme) do jedného
-reťazca pomocou cmdletu `Write-Host`, v ktorom pomocou parametra
-`-NoNewLine` zabránime vypisovaniu znaku konca riadka medzi jednotlivými
-znakmi padajúcimi z rúry.
+Vo funkcii desaťkrát zavoláme pomocnú funkciu `Get-RandomChar`, čo znamená,
+že do rúry sa pošle desať náhodných znakov. Celú rúru uvedieme do zátvorky,
+aby sme ju mohli považovať za pole desiatich znakov, a následne skonkatenovať
+(spojiť) do jedného reťazca pomocou operátora `-join`.
 
 ### Alternatívne riešenie: použitie `-join`
 
@@ -162,9 +159,8 @@ znakmi padajúcimi z rúry.
         -join ( 1..10 | ForEach-Object { Get-RandomChar } )
     }
 
-Operátor `-join` umožňuje spájať reťazce z poľa, či rúry. Jeho parameter
-uzavrieme do zátvoriek, čo znamená, že všetky náhodné znaky z rúry
-spojí do jedného reťazca
+Kratšie, aj keď prekvapivejšie riešenie, použije operátor `-join`
+v prefixovom tvare. V takomto prípade nemusíme uvádzať spájajúci reťazec.
 
 ### Alternatívne riešenie: výber viacerých náhodných prvkov [`Get-Random`]
 
@@ -183,9 +179,7 @@ Vytvorte funkciu, ktorá vygeneruje náhodné heslo dĺžky *n* znakov
 -----------------------------------------------------------------
 
     function Get-RandomPassword($length) {
-        1..$length |
-            ForEach-Object { Get-RandomChar } |
-                Write-Host -NoNewLine
+        (1..$length |  ForEach-Object { Get-RandomChar }) -join ""
     }
 
 Parametre funkcie uvedieme do zátvoriek, pričom ich uvádzame s dolárom
@@ -232,15 +226,17 @@ Vytvorte funkciu `Get-HomeDirectory`, ktorá pre zadaného používateľa vráti
 ------------------------------------------------------------------------------------------------
 
 	function Get-HomeDirectory($username) {
-	    $sid = (Get-WmiObject Win32_UserAccount -Filter "name = '$username'").sid
-	    (Get-WmiObject Win32_UserProfile -filter "sid = '$sid'").LocalPath
+	    $account = Get-WmiObject Win32_UserAccount -Filter "name = '$username'"
+	    $sid = account.sid
+	    $profile = Get-WmiObject Win32_UserProfile -Filter "sid = '$sid'"
+	    $profile.LocalPath
 	}
 
 Volanie:
 
 	Get-HomeDirectory "rn"
 
-Výpis [na Windows 8.1]:
+Výpis (na Windows 8.1):
 
 	C:\Users\rn
 
@@ -257,15 +253,18 @@ Vo funkcii využijeme:
     'rn'"`.
 *   funkcie nemusia používať `return`. Výsledkom funkcie je výsledok
     posledného vykonaného výrazu vo funkcii. V našej funkcii je to
-    výsledok vlastnosti `LocalPath` na objekte profilu používateľa.
+    výsledok vlastnosti `LocalPath` na objekte profilu používateľa z premennej
+    `$profile`
 
 Vytvorte funkciu `Get-HomeDirectory`, ktorá vypíše domovský adresár používateľa z rúry
 --------------------------------------------------------------------------------------
 
 	function Get-HomeDirectory {
-	    foreach($username in $input) {
-	        $sid = (Get-WmiObject Win32_UserAccount -filter "name = '$username'").sid
-	        (Get-WmiObject Win32_UserProfile -filter "sid = '$sid'").LocalPath
+	    foreach($user in $input) {
+            $account = Get-WmiObject Win32_UserAccount -Filter "name = '$user'"
+            $sid = account.sid
+            $profile = Get-WmiObject Win32_UserProfile -Filter "sid = '$sid'"
+            $profile.LocalPath
 	    }
 	}
 
@@ -280,7 +279,9 @@ Vytvorte funkciu, ktorá zistí celkové veľkosti adresárov (rekurzívne)
 
 	function Measure-Directory {
 	    foreach($item in $input) {
-	        $size = (Get-Item $item.FullName -Recurse | Measure-Object -Sum -Property Length).Sum
+	        $size = Get-Item $item.FullName -Recurse 
+                        | Measure-Object -Sum -Property Length
+                            | Select-Object -ExpandProperty Sum
 	        @{$item.FullName = $size}
 	    }
 	}
@@ -382,10 +383,10 @@ Vytvorte funkciu, ktorá vygeneruje náhodné heslá pre zoznam používateľov
 ------------------------------------------------------------------------
 
     filter Get-RandomCredentials([int] $length = 10) {
-      $credentials = New-Object PSObject | Select-Object Name, Password
-      $credentials.Name = $_
-      $credentials.Password = Get-RandomPassword $length
-      $credentials
+        $credentials = New-Object PSObject | Select-Object Name, Password
+        $credentials.Name = $_
+        $credentials.Password = Get-RandomPassword $length
+        $credentials
     }
 
 Použitie funkcie:
