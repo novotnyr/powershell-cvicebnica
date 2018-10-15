@@ -26,7 +26,7 @@ Filtrujte objekty cez `Where-Object`.
 
 Takto môžeme zápisy skracovať na minimum:
 
-	gci | ? Length -gt 20MB
+	gci | ? length -gt 20MB
 
 To funguje pre prípady, že sa overuje jedna vlastnosť. Ak sa
 overuje zložená podmienka alebo sa overuje vnorená vlastnosť, je
@@ -41,19 +41,21 @@ Stačí použiť `Select-Object`.
 
 	Get-Process | Select-Object ID, ProcessName
 
-Cmdlet vyrobí pre každý objekt na vstupe nový objekt, ktorý obsahuje len uvedené vlastnosti. Powershell vyrobí špeciálnu triedu v mennom priestore `Selected`.
+Cmdlet vyrobí pre každý objekt na vstupe nový objekt, ktorý obsahuje len uvedené
+vlastnosti. Powershell vyrobí špeciálnu triedu v mennom priestore `Selected`.
 
-V príklade sa do rúry pošlú objekty typu `Selected.System.Diagnostics.Process`, hoci pôvodné objekty boli z priestoru `System.Diagnostics.Process`.
+V príklade sa do rúry pošlú objekty typu `Selected.System.Diagnostics.Process`,
+hoci pôvodné objekty boli z priestoru `System.Diagnostics.Process`.
 
 Ako vybrať z objektu výhradne jednu vlastnosť?
 ----------------------------------------------
 ### `ForEach-Object`
 
-Použime `ForEach-Object` s uvedením názvu vlastnosti
+Použime `ForEach-Object` s uvedením názvu vlastnosti:
 
 	Get-ChildItem | ForEach-Object FullName
 
-Elegantné riešenie používa alias pre `ForEach-Object`
+Elegantné riešenie používa alias pre `ForEach-Object`:
 
 	Get-ChildItem | % FullName
 
@@ -63,7 +65,9 @@ Použime `Select-Object` a parameter `-ExpandProperty`:
 
 	Get-ChildItem | Select-Object -ExpandProperty FullName
 
-V príklade posielame do rúry objekty pre súbory či adresáre a cmdlet `Select-Object` vytiahne z každého objektu vlastnosť `FullName` a zapíše ju do rúry. Keďže táto vlastnosť je reťazcového typu, do rúry pošle len reťazec.
+V príklade posielame do rúry objekty pre súbory či adresáre a cmdlet
+`Select-Object` vytiahne z každého objektu vlastnosť `FullName` a zapíše ju do
+rúry. Keďže táto vlastnosť je reťazcového typu, do rúry pošle len reťazec.
 
 ### Bodkové notácie
 
@@ -104,6 +108,7 @@ Skrátený alias:
     Get-ChildItem | % { "* " + $_.Name }
 
 ###  `ForEach-Object` ako `Select-Object`
+
 Cmdlet `ForEach-Object` sa vie správať ako `Select-Object`:
 
     Get-ChildItem | Select-Object -ExpandProperty Name
@@ -113,7 +118,11 @@ K dispozícii je aj skrátená možnosť, ktorá funguje pre jednoduché (nevnor
 vlastnosti:
 
     Get-ChildItem | ForEach-Object Name
-    
+
+Skrátený zápis využíva alias `%`:
+
+    Get-ChildItem | % Name
+
 Ako zotriediť objekty?
 ----------------------
 Použime cmdlet `Sort-Object`:

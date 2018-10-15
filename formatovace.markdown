@@ -46,7 +46,51 @@ Na konci každej rúry je formátovač, ktorý zapíše objekty v primeranom tva
 
 Parametrom `-AutoSize` nastavíme automatické šírky stĺpcov podľa najširšej položky.
 
-Porovnajte tiež ďalšie formátovače:
+Vypíšte obsah aktuálneho adresára do mriežky [`Format-Wide`]
+------------------------------------------------------------
 
-*	`Format-Wide` / `fw`: na šírku
-*	`Format-List` / `fl`: do zoznamu pod seba.
+    Get-ChildItem | Format-Wide
+
+Výsledok:
+
+        Directory: C:\Users\rn
+
+    [Contacts]                                                  [Desktop]
+    [Documents]                                                 [Downloads]
+    [Favorites]                                                 [Links]
+    [Music]                                                     [Pictures]
+    [Saved Games]                                               [Searches]
+    [Videos]                                                    items.xml
+    rss.xml
+
+Vypíšte obsah aktuálneho adresára [`Format-Wide` a `AutoSize`]
+--------------------------------------------------------------
+
+    Get-ChildItem | Format-Wide -AutoSize
+
+Výpis naformátuje do primeraného počtu stĺpcov:
+
+        Directory: C:\Users\novotnyr
+
+    [Contacts]     [Desktop]      [Documents]    [Downloads]    [Favorites]    
+    [Links]        [Music]        [Pictures]     [Saved Games]  [Searches]
+    [Videos]       items.xml      rss.xml
+
+Vypíšte obsah aktuálneho adresára pod seba [`Format-List`]
+----------------------------------------------------------
+
+    Get-ChildItem -File | Format-List -Property Name, Length, LastWriteTime
+
+Výstup ukáže jednotlivé objekty pod seba, s vlastnosťami pod sebou:
+
+    Name          : items.xml
+    Length        : 57
+    LastWriteTime : 10/7/2018 10:07:11 AM
+    
+    Name          : rss.xml
+    Length        : 8929
+    LastWriteTime : 10/9/2018 5:32:33 AM
+
+### Alternatívne riešenie: skrátený zápis [alias `fl`]
+
+    gci -file | fl name, length, lastwritetime
