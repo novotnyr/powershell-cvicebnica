@@ -113,35 +113,30 @@ Vypíšte 10x text `Budem si robiť domáce úlohy.` [cyklus `while`]
 
 Napíšte ľubovoľný nekonečný cyklus
 ----------------------------------------------------------------------
-Zlé riešenie:
-
-	while (true) {
-	    "Budem si robiť domáce úlohy."
-	}
-
-Hláška je:
-
-	The term 'true' is not recognized as the name of a cmdlet, 
-	function, script file, or operable program. Check the spelling of
-	 the name, or if a path was included, verify that the path is
-	  correct and try again.
-
-Výraz `true` v Powershelli nie je definovaný. 
-
-Korektné riešenie využíva premennu `$true`, ktorá obsahuje "pravdu".
 
 	while ($true) {
 	    "Budem si robiť domáce úlohy."
 	}
 
-Prirodzene, existuje aj opačná premenná `$false` reprezentujúca
-logické "nie".
+Špeciálna premenná `$true` obsahuje "pravdu", a jej opak `$false`
+predstavuje booleovskú nepravdivú hodnotu.
+
+<div class="note" markdown="1">
+Výraz `true` v Powershelli nie je definovaný. Pokus o `while(true)`
+povedie k chybe:
+
+	The term 'true' is not recognized as the name of a cmdlet, 
+	function, script file, or operable program. 
+</div>
 
 ### Alternatíva: nenulové výrazy sú pravdivé
 
 	while (1) {
 	    "Budem si robiť domáce úlohy."
 	}
+
+Pri vyhodnocovaní booleovských podmienok je 0 považovaná za nepravdu
+a hocijaká iná hodnota za pravdu `$true`.
 
 Funkcie
 =======
