@@ -164,6 +164,13 @@ tvrdým pretypovaním čísla (*int*) na znak (*char*).
         [char] (Get-Random -Min 97 -Max 122)
     }
 
+### Alternatívne riešenie: intervaly znakov [Powershell 6]
+
+    function Get-RandomChar {
+        'a'..'z' | Get-Random
+    }
+
+
 Zavolajte funkciu generujúcu náhodný znak
 -----------------------------------------
 
