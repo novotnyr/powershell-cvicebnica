@@ -141,14 +141,12 @@ a hocijaká iná hodnota za pravdu `$true`.
 Funkcie
 =======
 
-Vytvorte funkciu, ktorá vygeneruje náhodný znak
------------------------------------------------
+Vytvorte funkciu pre generovanie náhodného dvadsaťznakového hesla
+-----------------------------------------------------------------
 
-    function Get-RandomChar {
-        Get-Random -Min 97 -Max 122 | ForEach-Object { [char] $PSItem }
+    function Get-RandomPassword {
+        Get-Random -Min 97 -Max 122 -Count 2O | ForEach-Object { [char] $_ }
     }
-
-Funkciu použijeme v ďalšom kroku na generovanie hesla.
 
 Funkcie sa majú tváriť ako cmdlety a teda by mali dodržiavať konvenciu
  *sloveso*-*podstatné meno*.
@@ -158,67 +156,33 @@ Ak využijeme vlastnosti ASCII tabuľky, vieme, že písmená od `a` po `z`
 majú ASCII kód od 97 do 122. Zmenu náhodného čísla na znak urobíme
 tvrdým pretypovaním čísla (*int*) na znak (*char*).
 
-### Alternatívne riešenie: pretypovanie výsledku
-
-    function Get-RandomChar {
-        [char] (Get-Random -Min 97 -Max 122)
-    }
-
 ### Alternatívne riešenie: intervaly znakov [Powershell 6]
 
-    function Get-RandomChar {
-        'a'..'z' | Get-Random
+    function Get-RandomPassword {
+        ('a'..'z' | Get-Random -Count 20) -join ""
     }
 
+PowerShell 6 podporuje aj znakové intervaly. Necháme si vygenerovať znaky
+od `a` po `z` (teda rúru z 26 znakov), z ktorých následne vyberiem 20 znakov.
+Celú náhodnú rúru uvedieme do zátvorky,
+aby sme ju mohli považovať za pole dvadsiatich znakov, a následne skonkatenovať
+(spojiť) do jedného reťazca pomocou operátora `-join`.
 
-Zavolajte funkciu generujúcu náhodný znak
------------------------------------------
+Zavolajte funkciu generujúcu náhodné heslo
+------------------------------------------
 
-    Get-RandomChar
+    Get-RandomPassword
 
 Na rozdiel od iných programovacích jazykov sa za názov funkcie nepíšu
 zátvorky. Nezabudnime, že funkcie sa majú tváriť ako cmdlety, v ktorých
 sa zátvorky takisto nepíšu.
 
-Vytvorte funkciu, ktorá vygeneruje náhodné heslo dĺžky 10 znakov
-----------------------------------------------------------------
-
-    function Get-RandomString {
-        ( 1..10 | ForEach-Object { Get-RandomChar } ) -join ""
-    }
-
-Vo funkcii desaťkrát zavoláme pomocnú funkciu `Get-RandomChar`, čo znamená,
-že do rúry sa pošle desať náhodných znakov. Celú rúru uvedieme do zátvorky,
-aby sme ju mohli považovať za pole desiatich znakov, a následne skonkatenovať
-(spojiť) do jedného reťazca pomocou operátora `-join`.
-
-### Alternatívne riešenie: použitie `-join`
-
-    function Get-RandomString {
-        -join ( 1..10 | ForEach-Object { Get-RandomChar } )
-    }
-
-Kratšie, aj keď prekvapivejšie riešenie, použije operátor `-join`
-v prefixovom tvare. V takomto prípade nemusíme uvádzať spájajúci reťazec.
-
-### Alternatívne riešenie: výber viacerých náhodných prvkov [`Get-Random`]
-
-    function Get-RandomString {
-        -join ( 97..122 | Get-Random -Count 10 | % { [char] $_ } )
-    }
-
-Najprv vygenerujeme zoznam čísiel reprezentujúcich znaky medzi `a` a `z`, teda
-s ASCII kódmi medzi 97..122. Cmdlet `Get-Random` má možnosť zopakovať
-náhodný výber zo sady objektov na vstupe. Použitím parametra `-Count`
-môžeme vybrať zo vstupu náhodných 10 čísiel, ktoré potom prevedieme
-na znaky. V úplnom závere všetky znaky zlepíme do reťazca pomocou operátora
-`-join`.
-
 Vytvorte funkciu, ktorá vygeneruje náhodné heslo dĺžky *n* znakov
 -----------------------------------------------------------------
 
     function Get-RandomPassword($length) {
-        (1..$length |  ForEach-Object { Get-RandomChar }) -join ""
+        Get-Random -Min 97 -Max 122 -Count $length 
+            | ForEach-Object { [char] $_ }
     }
 
 Parametre funkcie uvedieme do zátvoriek, pričom ich uvádzame s dolárom
@@ -228,38 +192,20 @@ Pozor na syntax volania! Správny spôsob volania je bezzátvorkový:
 
     Get-RandomPassword 15
 
-<div class="note" markdown="1">
-Funkcie sa majú tváriť ako cmdlety, čo je dôvod, prečo sa neuvádzajú
-ich parametre do zátvoriek!
-</div>
-
-Zavolajte funkciu `Get-RandomPassword` bez parametra
-----------------------------------------------------
-
-    Get-RandomPassword
-
-Výsledkom bude dvojznakové heslo, čo je zvláštna vec!
-
-<div class="note" markdown="1">
-Ak vynecháme parameter, vnútro funkcie bude volať interval od 1 po prázdny
-obsah, teda dvakrát. Je to nečakaná vec!
-</div>
-
 Obohaťme funkciu `Get-RandomPassword` o dátové typy
 ---------------------------------------------------
 
-    function Get-RandomPassword([int] $length = 10) {
-        1..$length |
-            ForEach-Object { Get-RandomChar } |
-                Write-Host -NoNewLine
+    function Get-RandomPassword([int] $length = 20) {
+        Get-Random -Min 97 -Max 122 -Count $length 
+            | ForEach-Object { [char] $_ }
     }
 
 Parameter môže mať dátový typ "celé číslo" (`int`) a môže mať implicitnú
 hodnotu, napr. desať:
 
-    [int] $length = 10
+    [int] $length = 20
 
-Ak parameter vynecháme, vygeneruje sa desaťznakové heslo.
+Ak parameter vynecháme, vygeneruje sa dvadsaťznakové heslo.
 
 Vytvorte funkciu `Get-HomeDirectory`, ktorá pre zadaného používateľa vráti jeho domovský adresár
 ------------------------------------------------------------------------------------------------
