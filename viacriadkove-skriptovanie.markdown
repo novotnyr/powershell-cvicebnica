@@ -258,18 +258,34 @@ Volanie vyskúšajme na viacerých reťazcoch:
 	"rn", "UpdatusUser" | Get-HomeDirectory
 
 Každá funkcia má skrytú premennú `$input`, ktorá je kolekcia s prvkami prichádzajúcimi z rúry.
- 
+
+### Alternatívne riešenie: blok `process`
+
+ 	function Get-HomeDirectory {
+ 	    process {
+             $account = Get-WmiObject Win32_UserAccount -Filter "name = '$_'"
+             $sid = account.sid
+             $profile = Get-WmiObject Win32_UserProfile -Filter "sid = '$sid'"
+             $profile.LocalPath
+ 	    }
+ 	}
+
+Funkcia môže obsahovať blok `process`, ktorý bude volaný opakovane
+pre každý objekt z rúry. Vo vnútri tohto bloku je k dispozícii premenná
+`$_`, resp. `$PSItem` s aktuálne spracovávaným objektom. (Blok `process`
+možno chápať ako vnútro cyklu `for`).
+
 Vytvorte funkciu, ktorá zistí celkové veľkosti adresárov (rekurzívne)
 ---------------------------------------------------------------------
 
-	function Measure-Directory {
-	    foreach($item in $input) {
-	        $size = Get-Item $item.FullName -Recurse 
-                        | Measure-Object -Sum -Property Length
-                            | Select-Object -ExpandProperty Sum
-	        @{$item.FullName = $size}
-	    }
-	}
+    function Measure-Directory {
+        process {
+            $size = Get-ChildItem $_ -File -Recurse -Force -ErrorAction SilentlyContinue |
+                        Measure-Object -Sum -Property Length |
+                            Select-Object -ExpandProperty Sum
+            @{$item.FullName = $size}
+        }
+    }
 
 Vo výsledku potrebujeme pre každý adresár poslať do rúry dvojicu
 názov-veľkosť. Využime na to *hashovaciu tabuľku* (hash table), ktorá je
@@ -278,11 +294,11 @@ v iných jazykoch známa aj ako *hash*, slovník (*dictionary*), či
 
 Volanie:
 
-	ls D:\MP3 | Measure-Directory
+	Get-Item D:\MP3 | Measure-Directory
 
 Alebo:
 
-	"D:\MP3\Ectasy of Saint Theresa", "D:\MP3\Happy Melon"  | Get-Item | Measure-Directory
+	"D:\MP3\Ectasy of Saint Theresa", "D:\MP3\Happy Melon" | Get-Item | Measure-Directory
 
 Očíslujte položky z rúry
 ------------------------
@@ -299,8 +315,7 @@ Volanie:
 
 	dir | Enumerate-Items
 
-Očíslujte položky z rúry [alternatívna syntax]
-----------------------------------------------
+### Alternatívne riešenie: bloky `begin`, `process` a `end`
 
 	function Enumerate-Items {
 		begin {
@@ -316,36 +331,11 @@ Funkcia môže pozostávať z troch blokov:
 
 *	`begin`: vykoná sa pred spracovaním prvého objektu z rúry
 *	`end`: vykoná sa po spracovaní posledného objektu z rúry
-*	`process`: vykoná sa pre každý objekt z rúry samostatne. V premennej `$_` sa zjaví aktuálny objekt, ktorý prichádza z rúry.
+*	`process`: vykoná sa pre každý objekt z rúry samostatne.
 
-Vytvorte filter, ktorým spočítate veľkosť adresárov z rúry
------------------------------------------------------------
 
-	filter Measure-Directory {
-        $size = (Get-Item $_.FullName -Recurse | Measure-Object -Sum -Property Length).Sum
-        @{$_.FullName = $size}
-	}
-
-Funkcia, ktorá má len blok `process`, sa nazýva *filter*. Riešenie je ekvivalentné 
-
-	function Measure-Directory {
-	    foreach($item in $input) {
-	        $size = (dir $item.FullName -Recurse | Measure-Object -Sum -Property Length).Sum
-	        @{$item.FullName = $size}
-	    }
-	}
-
-a ekvivalentné:
-
-	function Measure-Directory {
-		process {
-        	$size = (dir $_.FullName -Recurse | Measure-Object -Sum -Property Length).Sum
-        	@{$_.FullName = $size}
-		}
-	}
-
-Zistite, ktoré procesy sú systémovo náročné (> 60% CPU)
--------------------------------------------------------
+Zistite, ktoré procesy sú systémovo náročné (> 60% CPU) [filtre]
+----------------------------------------------------------------
 
 	filter Get-CpuHeavyProcess {
 	    if($_.PercentProcessorTime -ge 60) {
@@ -357,23 +347,13 @@ Zistite, ktoré procesy sú systémovo náročné (> 60% CPU)
 	}
 	gwmi Win32_PerfFormattedData_PerfProc_Process | Get-CpuHeavyProcess
 
-Vyrobíme jednoduchý filter, ktorý sa díva na vlastnosť `PercentProcessorTime`.
+Filter je funkcia, ktorá obsahuje jedine blok `process`. V našom
+prípade vytvoríme filter, ktorý sa pozerá na objekty prichádzajúce
+z rúry, teda na premennú s názvom `$_` a filtruje ho podľa vyťazenia
+vo vlastnosti `PercentProcessorTime`.
 
 Zároveň demonštrujeme dynamické vytváranie objektu. `PSObject` je
 univerzálny objekt, ktorý vieme vytvoriť a ktorému vieme priradiť nové
 vlastnosti (properties). Následne vieme objekt obohacovať o hodnoty cez
 bodkové notácie.
 
-Vytvorte funkciu, ktorá vygeneruje náhodné heslá pre zoznam používateľov
-------------------------------------------------------------------------
-
-    filter Get-RandomCredentials([int] $length = 10) {
-        $credentials = New-Object PSObject | Select-Object Name, Password
-        $credentials.Name = $_
-        $credentials.Password = Get-RandomPassword $length
-        $credentials
-    }
-
-Použitie funkcie:
-
-    "novotnyr", "root" | Get-RandomCredentials
