@@ -114,9 +114,14 @@ Názvy parametrov možno skrátiť, pokiaľ nedôjde k nejednoznačnostiam.
 Zapíšte názvy súborov a adresárov do externého súboru
 -----------------------------------------------------
 
-	Get-Child-Item -Name > subory.txt
+	Get-ChildItem -Name > subory.txt
 
 Výstup ľubovoľného cmdletu možno zapísať do textového súboru použitím presmerovania cez `>`.
+
+Vypíšte všetky súbory a adresáre v aktuálnom adresári, vrátane skrytých
+-----------------------------------------------------------------------
+
+    Get-ChildItem -Force
 
 Overte existenciu súboru `subory.txt`
 -------------------------------------
@@ -159,7 +164,6 @@ Alternatívne:
 
 	gci ~
 
-
 Presuňte sa do adresára `C:\Windows`
 ------------------------------------
 
@@ -188,17 +192,11 @@ Alternatívne:
 
 Vypíšte všetky súbory a adresáre v `C:/Users`, ktoré sa začínajú na „P“.
 ------------------------------------------------------------------------
-Možnosť 1:
-
-	cd C:\Users
-	Get-ChildItem P*
-
-Možnosť 2:
 
 	Get-ChildItem C:\Users\P*
 
-Vypíšte všetky súbory typu XML v domovskom adresári.
-----------------------------------------------------
+Vypíšte všetky súbory typu XML v domovskom adresári
+---------------------------------------------------
 
 	Get-ChildItem ~ *.xml
 
@@ -206,8 +204,8 @@ Alternatívne:
 
 	ls ~ *.xml
 
-Vypíšte všetky súbory v aktuálnom adresári a vo všetkých jeho podadresároch.
-----------------------------------------------------------------------------
+Vypíšte všetky súbory v aktuálnom adresári a vo všetkých jeho podadresároch
+---------------------------------------------------------------------------
 
 	Get-ChildItem –Recurse
 
@@ -215,8 +213,8 @@ Parametre možno skracovať, kým nedôjde k nejednoznačnosti:
 	
 	gci -r
 
-Vypíšte všetky XML súbory v domovskom adresári a vo všetkých jeho podadresároch.
---------------------------------------------------------------------------------
+Vypíšte všetky XML súbory v domovskom adresári a vo všetkých jeho podadresároch
+-------------------------------------------------------------------------------
 
 	Get-ChildItem -Path . -Filter *.xml -Recurse 
 
@@ -247,6 +245,27 @@ Vypíšte len plochý zoznam súborov z predošlej úlohy
 ---------------------------------------------------
 	
 	Get-ChildItem ~ *.xml -Recurse -Name
+
+Vypíšte všetky súbory a adresáre v aktuálnom adresári
+-----------------------------------------------------
+
+    Get-ChildItem -Path ~ -Force -Recurse -ErrorAction SilentlyContinue
+
+Ak cmdlet pri spracovávaní vstupu narazí na chybu, môžeme
+prispôsobiť jeho správanie. V našom prípade sa môže stať, že k niektorým
+adresárom nemáme právo prístupu, čo spôsobí chybový červený výpis
+v konzole.
+
+Ak nastavíme parameter `-ErrorAction` na `SilentlyContinue`, takéto
+chyby sa budú ignorovať a výpis bude potlačený.
+
+Možnosti sú:
+
+- `Continue`: bežná možnosť, kde sa chyba vypíše, ale spracovávanie pokračuje
+- `Stop`: ak cmdlet narazí na chybu, zastaví sa
+- `SilentlyContinue`: chyby sa schovajú, ale spracovávanie pobeží ďalej
+- `Inquire`: cmdlet vyzve používateľa na určenie ďalšieho postupu
+
 
 Spočítajte, koľko je súborov typu XML v aktuálnom adresári a podadresároch
 --------------------------------------------------------------------------
@@ -427,8 +446,8 @@ Alternatívny zápis:
 
 	ls | select -exp fullname
 
-Nájdite plnú cestu a veľkosť najväčšieho súboru v domovskom adresári vrátane podadresárov.
-------------------------------------------------------------------------------------------
+Nájdite plnú cestu a veľkosť najväčšieho súboru v domovskom adresári vrátane podadresárov
+-----------------------------------------------------------------------------------------
 
 	Get-ChildItem -Recurse | 
 	    Sort-Object -Property Length -Descending | 
@@ -538,7 +557,7 @@ Triedenie je potrebné, pretože bez nich `Get-Unique` nebude fungovať správne
     Get-ChildItem . *.mp3 -Recurse |
         Select-Object -ExpandProperty DirectoryName |
             Sort-Object | 
-                | Get-Unique
+                Get-Unique
 
 Spočítajte frekvencie prípon súborov v adresári [grouping, `Group-Object`]
 --------------------------------------------------------------------------
