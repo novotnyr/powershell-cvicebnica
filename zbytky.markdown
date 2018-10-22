@@ -41,23 +41,19 @@ vôbec neriešime menné priestory XML.
 Zistite frekvencie jednotlivých slov v súbore
 ---------------------------------------------
 
-	gc babel.txt | % { 
-	    $_.split() | % { 
-	        $_.toLower().Trim() -replace "[^a-z]", "" | ? {$_.Length -ge 0 }
-	    }  
-	} | Group-Object | Sort Count
-
+    Get-Content babel.txt | 
+        ForEach-Object { $_.split() } | 
+            ForEach-Object { $_.toLower().trim() -replace "\W", "" } | 
+                Where-Object Length -gt 0 | 
+                    Group-Object | 
+                        Sort-Object -Property Count
 
 *	Vyjdime z cmdletu `Get-Content`, ktorý pošle do rúry jednotlivé riadky súboru. 
 *	Každý riadok rozdelíme na slová cez `Split`: vzniknú tým jednotlivé slová, ktoré preiterujeme v podrúre.
-*	Každé slovo zhodíme na malé písmená, odsekneme začiatočné a koncové medzery a každé nepísmeno nahradíme prázdnym znakom. Zároveň do rúry pošleme len slová, ktorá po upratovaní majú stále nenulovú dĺžku.
+*	Každé slovo zhodíme na malé písmená, odsekneme začiatočné a koncové medzery a každé nepísmeno nahradíme prázdnym znakom.
+*	Odfiltrujeme slová s nulovou dĺžkou, ktoré vznikli z pseudoslov ako pomlčky.
 *	Všetky slová zgrupneme cez `Group-Object`, čím získame frekvencie.
 *	Tie už len potriedime podľa počtu a sme hotoví.
-
-
-Alternatívne riešenie:
-
-	cat capybara.txt | % { $_.split() } | % { $_.toLower().Trim() -replace "\W", "" } | ? Length -gt 0 | group | select name, count | sort-object count -desc
 
 Vypíšte zoznam fontov v systéme
 -------------------------------
