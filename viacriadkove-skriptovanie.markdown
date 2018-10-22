@@ -30,6 +30,7 @@ Následne treba odsúhlasiť v GUI zmenu politiky. Táto politika umožní spú�
 
 Konštrukcie z procedurálneho programovania
 ==========================================
+
 Oboznámte sa so syntaxou premenných. Vypočítajte cenu s DPH.
 ------------------------------------------------------------
 
