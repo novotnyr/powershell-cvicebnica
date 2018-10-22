@@ -28,9 +28,6 @@ Skrátený alias:
 
 Následne treba odsúhlasiť v GUI zmenu politiky. Táto politika umožní spúšťať všetky skripty, ale tie, ktoré sa stiahli z webu, musia byť digitálne podpísané.
 
-Konštrukcie z procedurálneho programovania
-==========================================
-
 Oboznámte sa so syntaxou premenných. Vypočítajte cenu s DPH.
 ------------------------------------------------------------
 

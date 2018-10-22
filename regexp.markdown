@@ -380,8 +380,8 @@ Vytvoríme regulárny výraz, v ktorom označíme skupiny pre roky a názvy vyda
 	([0-9]{4}).*(Windows .*) \[
 
 *	prvá skupina obsahuje štyri cifry z roka
-*	za ňou nasledujú ľubovoľné znaky, kým sa nenarazí na *Windows*
-*	*Windows a text až po medzeru pred hranatou zátvorkou je názov vydania. Označíme ho ako druhú skupinu
+*	za ňou nasledujú ľubovoľné znaky, kým sa nenarazí na `Windows`
+*	`Windows` a text až po medzeru pred hranatou zátvorkou je názov vydania. Označíme ho ako druhú skupinu
 *	posledný znak `\[` predstavuje explicitnú medzeru
 
 Obe skupiny sa objavia na prvom a druhom prvku v poli `$matches`.
