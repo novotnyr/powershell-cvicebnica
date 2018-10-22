@@ -46,6 +46,37 @@ Overte dátový typ premennej `$cena`
 
 Dátové typy využívajú objektový model z .NET Frameworku.
 
+Vypíšte login používateľa a jeho doménu v tvare používateľ@doména [interpolácia reťazcov]
+-----------------------------------------------------------------------------------------
+
+    "$Env:USERNAME@$Env:USERDOMAIN"
+
+Využijeme premenné prostredia, ktoré majú v Powershelli predponu `Env:`.
+Okrem toho využijeme *interpoláciu reťazcov*: ak sa v reťazci vyskytne
+premenná, pri vyhodnotení sa meno premenné priamo nahradí jej obsahom. To
+nám pomôže vyhnúť sa zbytočnému a neprehľadnému konkatenovaniu reťazcov cez
+operátor `+`.
+
+Otestujte sieťovú dostupnosť troch serverov [polia, `Test-Connection`]
+----------------------------------------------------------------------
+
+    $hosts = "maps.google.com", "drive.google.com", "gmail.com"
+    Test-Connection -ComputerName hosts
+
+Premenná `$hosts` reprezentuje pole (*array*). Pri deklarácii
+oddeľujeme položky čiarkou.
+
+Prázdne pole a jednoprvkové pole uvádzame do `@(...)`, aby sme ich
+odlíšili od jediného prvku v rúre.
+
+Prázdne pole:
+
+    $hosts = @()
+
+Jednoprvkové pole:
+
+    $hosts = @("maps.google.com")
+
 Z URL adresy zistite názov servera [`New-Object`]
 -------------------------------------------------
 
@@ -54,7 +85,9 @@ Z URL adresy zistite názov servera [`New-Object`]
 
 Cmdlet `New-Object` vie vytvoriť ľubovoľnú inštanciu
 objektu z frameworku `.NET`. V tomto prípade vytvoríme
-nový objekt typu `System.Uri`. Následne získame jeho vlastnosť `Host`.
+nový objekt typu `System.Uri`, z ktorého následne získame jeho vlastnosť `Host`.
+
+Parametre konštruktora uvádzame ako parametre cmdletu.
 
 Zistite cestu k priečinku Plochy (Desktop) [objekty COM]
 --------------------------------------------------------
@@ -82,25 +115,57 @@ Vypočítajte druhú odmocninu z 25
 
 Použime statickú metódu `Sqrt()` na objekte `System.Math`.
 
+Otestujte sieťovú dostupnosť troch serverov z rovnakej domény [`foreach]
+------------------------------------------------------------------------
 
-Vypíšte 10x text `Budem si robiť domáce úlohy.`
-------------------------------------------------------------
+    $hosts = "maps", "drive", "hangouts"
+    foreach($host in $hosts) {
+        Test-Connection -ComputerName "$host.google.com"
+    }
+
+Cyklus `foreach` prechádza kolekciou, a každý prvok vloží do premennej
+`$host`. V príklade sme zároveň použili interpoláciu reťazcov na vybudovanie
+plného mena stroja, ktorý sa má overiť.
+
+### Alternatívne riešenie: cmdlet For-Each
+
+    "maps", "drive", "hangouts" | 
+        ForEach-Object { Test-Connection -ComputerName "$_.google.com" }
+
+Cyklus možno často nahradiť priamym zaslaním objektov do rúry a ich
+následným spracovaním pomocou cmdletu `ForEach-Object`.
+
+Vypíšte 10x text `Budem si robiť domáce úlohy.` [cyklus `for`]
+--------------------------------------------------------------
 
 	for ($i = 0; $i -lt 10; $i++) {
-	    echo "Budem si robiť domáce úlohy."
+	    "Budem si robiť domáce úlohy."
 	}
 
 Cyklus `for` využíva klasickú C/C++/Java/C# syntax. Pozor na
 
 * deklaráciu premenných
-* porovnávanie dvoch hodnôt: namiesto `<` použite `-lt`.
+* porovnávanie dvoch hodnôt: namiesto `<` použime `-lt`.
 
-Alternatívne: príkaz `echo` nie je povinný, keďže samotný reťazec 
-predstavuje výraz, ktorý sa pošle do rúry a teda do výstupu.
+Samotný text nemusíme vypisovať pomocou žiadneho príkazu, pretože
+reťazce sa automaticky pošlú do rúry.
 
-	for ($i = 0; $i -lt 10; $i++) {
-	    "Budem si robiť domáce úlohy."
-	}
+Vypíšte 10x text `Budem si robiť domáce úlohy.` [rozsahy]
+---------------------------------------------------------
+
+    1..10 | ForEach-Object { "Budem si robiť domáce úlohy." }
+
+Dátový typ rozsahu (*range*) umožňuje rýchlo vytvárať zoznamy
+čísiel z daného intervalu. Rozsah `1..10` reprezentuje
+pole čísiel od 1 do 10 (vrátane), resp. pošle do rúry
+čísla od 1 po 10. To možno s výhodou použiť na vykonávanie
+opakovaných akcií namiesto cyklu `for`.
+
+Alternatívne riešenie: skrátený zápis
+-------------------------------------
+
+    1..10 | % { "Budem si robiť domáce úlohy." }
+
 
 Vypíšte 10x text `Budem si robiť domáce úlohy.` [cyklus `while`]
 ----------------------------------------------------------------
@@ -228,9 +293,7 @@ Výpis (na Windows 8.1):
 Vo funkcii využijeme:
 
 *   získavanie informácií o používateľovi cez WMI a cmdlet `Get-WmiObject`
-*   interpoláciu reťazcov. Ak máme premennú `$username`, a chceme ju
-    použiť vo vnútri reťazca, nemusíme ich konkatenovať cez `+`. Dolárové
-    premenné vo vnútri reťazcov sa automaticky nahradia ich hodnotami:
+*   interpoláciu reťazcov.
 
         "name = '$username'"
 
