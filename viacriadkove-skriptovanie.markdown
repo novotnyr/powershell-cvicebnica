@@ -406,7 +406,7 @@ Zistite, ktoré procesy sú systémovo náročné (> 60% CPU) [filtre]
 	        $obj
 	    }
 	}
-	gwmi Win32_PerfFormattedData_PerfProc_Process | Get-CpuHeavyProcess
+	gcim Win32_PerfFormattedData_PerfProc_Process | Get-CpuHeavyProcess
 
 Filter je funkcia, ktorá obsahuje jedine blok `process`. V našom
 prípade vytvoríme filter, ktorý sa pozerá na objekty prichádzajúce
