@@ -9,82 +9,83 @@ Vypíšte zoznam všetkých bežiacich procesov [`Get-Process`]
 ----------------------------------------------------------
 
 	Get-Process
-	
-Cmdlet má alias zodpovedajúci linuxovej konvencii:
-	
-    ps
+
+<div class="note alias" markdown="1">
+Aliasy:
+
+* Powershell: `gps`
+* Linuxovský alias na Windowse: `ps`
+</div>
 
 Vypíšte počet bežiacich inštancií `svchost`u. [`Get-Process`, `Measure-Object`]
 -------------------------------------------------------------------------------
 
     Get-Process svchost | Measure-Object
 
-Skrátený zápis:
-
-	ps svchost | measure
+<div class="note minified" markdown="1">
+	gps svchost | measure
+</div>
 
 Vypíšte zoznam atribútov, na ktoré sa môžete dopytovať pri procese
 -------------------------
 
     Get-Process | Get-Member
 
-Skrátený zápis:
-
-	ps | gm
+<div class="note minified" markdown="1">
+	gps | gm
+</div>
 
 Vypíšte zoznam procesov a ku každému procesu vypíšte cestu k spúšťaciemu súboru
 -------------------------------------------------------------------------------
 
     Get-Process | Select-Object Name, Path
 
-Skrátený zápis s použitím `Format-Table`:
-
-	ps | ft Name, Path –a
-
 Zistite, koľkokrát beží proces spustený súborom `C:\Windows\system32\notepad.exe`
 -------------------------
 
 	Get-Process | 
-	    Where-Object {$_.Path -eq "C:\Windows\system32\notepad.exe" } | 
+	    Where-Object Path -eq "C:\Windows\system32\notepad.exe" | 
 	        Measure-Object
+
+<div class="note minified" markdown="1">
+	(gps | ? Path -eq "C:\Windows\system32\notepad.exe").Count
+</div>
+
 
 Vypíšte mená a cesty procesov, ktoré boli spustené z `C:\Program Files`
 -----------------------------------------------------------------------
 
     Get-Process | 
-        Where-Object { $_.Path -match "C:\\Program Files" } | 
-            Format-Table Name, Path -AutoSize
+        Where-Object Path -match "C:\\Program Files" | 
+            Select-Object Name, Path
 
-Potrebné je zdvojenie lomiek (\\), pretože lomka má v regulárnych
-výrazoch špeciálny význam. Regulárne výrazy preberieme neskôr.
+Potrebné je zdvojenie lomiek (`\\`), pretože lomka má v regulárnych
+výrazoch špeciálny význam.
 
-Skrátený zápis:
+<div class="note minified" markdown="1">
+	(gps | ? Path -match "C:\\Program Files") | Select Name, Path
+</div>
 
-	ps | ? {$_.Path -match "C:\\Program Files" } | ft Name, Path
-
-Vypíšte procesy a ich vyťaženie CPU v zostupnom usporiadaní.
--------------------------
+Vypíšte procesy a ich vyťaženie CPU v zostupnom usporiadaní
+-----------------------------------------------------------
 
 	Get-Process | 
 	    Sort-Object -Descending CPU | 
-	        Format-Table Name, CPU –Autosize
+	        Select Name, CPU
 
-Skrátený zápis:
+Vypíšte jedno meno procesu, ktoré najviac vyťažuje procesor
+-----------------------------------------------------------
 
-	ps | sort -desc CPU | ft Name, CPU –a
-
-Vypíšte jedno meno procesu, ktoré najviac vyťažuje procesor.
--------------------------
     Get-Process |
         Sort-Object -Descending CPU |
-            Select-Object Name, CPU -First 1
-	
-Skrátený zápis:
-	
-	ps | sort -desc cpu | select name -first 1 
+            Select-Object -First 1 Name, CPU 
 
-Spustite novú inštanciu Skicára.
--------------------------
+<div class="note minified windows" markdown="1">
+	ps | sort -desc cpu | select name,cpu -first 1
+</div>
+
+Spustite novú inštanciu Skicára
+-------------------------------
 Klasická možnosť:
 
 	mspaint

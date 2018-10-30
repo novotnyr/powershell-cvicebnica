@@ -6,8 +6,8 @@ layout: page
 Súborový systém a adresáre
 ==========================
 
-Zistite, v ktorom adresári sa práve nachádzate.
------------------------------------------------
+Zistite, v ktorom adresári sa práve nachádzate
+----------------------------------------------
 
 Zistiť to môžeme pohľadom na výzvu (prompt).
 
@@ -18,68 +18,49 @@ Zistite, v ktorom adresári sa práve nachádzate pomocou [`Get-Location`]
 
     Get-Location
 
-Zistite, v ktorom adresári sa práve nachádzate pomocou [`Location`]
--------------------------------------------------------------------
-Ak má cmdlet názov `Get-[podstatné-meno]`, môžeme predponu `Get`
-vynechať. Zistiť adresár vieme cez:
+### Alternatívne riešenie: vynechanie `Get`
 
     Location
 
-Powershell si automaticky domyslí, že existuje cmdlet `Get-Location`.
+Ak má cmdlet názov `Get-[podstatné-meno]`, môžeme predponu `Get`
+vynechať.
 
-Zistite, v ktorom adresári sa práve nachádzate pomocou [`pwd`]
---------------------------------------------------------------
-Možno použiť aj linuxový názov:
+<div class="note alias" markdown="1">
+Aliasy `Get-Location`:
 
-	pwd
+* Skratka: `gl`
+* Linuxovský alias: `pwd`
+</div>
 
 Zobrazte súbory a adresáre v aktuálnom podadresári [`Get-ChildItem`]
 --------------------------------------------------------------------
 
 	Get-ChildItem
 
-Zobrazte súbory a adresáre v aktuálnom podadresári [`gci`]
-----------------------------------------------------------
-Príkaz možno skrátiť:
+<div class="note alias" markdown="1">
+Aliasy `Get-ChildItem`:
 
-	gci
+* Skratka: `gci`
+* Pre pamätníkov MS-DOSu a starého shellu: `dir`
+* Linuxovský alias na Windowse: `ls`
+</div>
 
-Zobrazte súbory a adresáre v aktuálnom podadresári [`ls`].
-----------------------------------------------------------
-Linuxácky alias:
-	
-	ls
-
-Zobrazte súbory a adresáre v aktuálnom podadresári [`dir`]
-----------------------------------------------------------
-
-Ak ste veteráni MS-DOSu a klasického windowsovského shellu `cmd.exe`,
-môžete použiť:
-
-	dir
-
-Preštudujte dokumentáciu k `ls` / `dir` / `Get-ChildItem`
----------------------------------------------------------
-
-Základný cmdlet pre získanie pomocníka pre cmdlet:
+Získajte dokumentáciu ku cmdletu `Get-ChildItem`
+------------------------------------------------
 
     Get-Help Get-ChildItem
 
-Cmdlet má viacero aliasov:
+<div class="note minified" markdown="1">
+	help gci
+</div>
 
-    help Get-ChildItem
-    
-Samozrejme, funguje aj pre aliasy:
-    
-    help dir
-    
-Fungujú aj linuxové alternatívy:
-	
-	man ls
+<div class="note alias" markdown="1">
+Aliasy `Get-Help`:
 
-Príklady môžete získať cez parameter `-examples`:
-
-	Get-Help Get-ChildItem -examples
+* Skratka: `help`
+* Pre pamätníkov MS-DOSu a starého shellu: `dir`
+* Linuxovský alias na Windowse: `man`
+</div>
 
 Zistite všetky alternatívne názvy pre výpis súborov a adresárov
 ---------------------------------------------------------------
@@ -100,16 +81,15 @@ Zobrazte len názvy súborov či adresárov v aktuálnom adresári
 ------------------------------------------------------------
 
     Get-ChildItem -Name
-    
-Použitie s linuxovým aliasom:
 
-	ls –Name
+<div class="note minified" markdown="1">
 
-Názvy parametrov možno skrátiť, pokiaľ nedôjde k nejednoznačnostiam.
-	
 	Get-ChildItem -n
 	gci -n
-	ls -n
+
+Názvy parametrov možno skrátiť, pokiaľ nedôjde k nejednoznačnostiam.
+</div>
+
 
 Zapíšte názvy súborov a adresárov do externého súboru
 -----------------------------------------------------
@@ -123,22 +103,16 @@ Vypíšte všetky súbory a adresáre v aktuálnom adresári, vrátane skrytých
 
     Get-ChildItem -Force
 
-Overte existenciu súboru `subory.txt`
--------------------------------------
-
-	Get-ChildItem subory.txt
-
-Alternatívne:
-	
-    ls subory.txt	
-	
-Alternatívne pomocou cmdletu `Get-Item`˛
+Overte existenciu súboru `subory.txt` [`Get-Item`]
+--------------------------------------------------
 
 	Get-Item subory.txt
 
-Alternatívne pomocou cmdletu `gi`, aliasu pre `Get-Item`
+<div class="note alias" markdown="1">
+Aliasy `Get-Item`:
 
-	gi subory.txt
+* Skratka: `gi`
+</div>
 
 Otvorte `subory.txt` v textovom editore
 ---------------------------------------
@@ -148,24 +122,15 @@ Otvorte `subory.txt` v textovom editore
 Adresáre
 ========
 
-Vypíšte obsah vlastného domovského adresára.
---------------------------------------------
-Ak ste v domovskom adresári, tak:
+Vypíšte obsah vlastného domovského adresára
+-------------------------------------------
 
 	Get-ChildItem ~
 
 Vlnka `~` je skratka pre cestu do domovského adresára.
 
-Alternatívne:
-
-	ls ~
-
-Alternatívne:
-
-	gci ~
-
-Presuňte sa do adresára `C:\Windows`
-------------------------------------
+Presuňte sa do adresára `C:\Windows` [`Set-Location`
+----------------------------------------------------
 
 	Set-Location C:\Windows
 
@@ -182,14 +147,6 @@ Windows rozlišuje obyčajné i spätné lomky:
 
 	Get-ChildItem C:/Users
 
-Alternatívne:
-
-	ls C:/Users
-
-Alternatívne:
-
-	gci C:\Users
-
 Vypíšte všetky súbory a adresáre v `C:/Users`, ktoré sa začínajú na „P“.
 ------------------------------------------------------------------------
 
@@ -200,18 +157,14 @@ Vypíšte všetky súbory typu XML v domovskom adresári
 
 	Get-ChildItem ~ *.xml
 
-Alternatívne:
-
-	ls ~ *.xml
-
 Vypíšte všetky súbory v aktuálnom adresári a vo všetkých jeho podadresároch
 ---------------------------------------------------------------------------
 
 	Get-ChildItem –Recurse
 
-Parametre možno skracovať, kým nedôjde k nejednoznačnosti:
-	
-	gci -r
+<div class="note minified" markdown="1">
+    gci -r
+</div>
 
 Vypíšte všetky XML súbory v domovskom adresári a vo všetkých jeho podadresároch
 -------------------------------------------------------------------------------
@@ -294,11 +247,11 @@ vie robiť štatistické výpočty.
 
 Vo výslednej položke `Count` nájdeme výsledok.
 
-### Alternatívne riešenie: skrátené zápisy
+<div class="note alias" markdown="1">
+Aliasy `Measure-Object`:
 
-Cmdlet `Measure-Object` má alias `Measure`:
-
-	ls ~ *.xml -r | measure
+* `measure`
+</div>
 
 Spočítajte, koľko miesta zaberajú všetky súbory v domovskom adresári
 --------------------------------------------------------------------
@@ -313,7 +266,7 @@ Každý súbor má atribút `Length` udávajúci jeho veľkosť (adresáre ju ma
 
 V cmdlete `Measure-Object` môžeme vynechať samotný názov parametra `-Property`:
 
-	ls ~ *.xml -r | measure -sum length
+	gci ~ *.xml -r | measure -sum length
 
 Vypíšte len adresáre v domovskom adresári
 -----------------------------------------
@@ -332,7 +285,7 @@ Pomocou `Get-ChildItem` rekurzívne (`-Recurse`) vypíšeme všetky riadne súbo
 
 Skrátený variant:
 
-	ls -r -file | measure
+	gci -r -file | measure
 
 Vypíšte súbory a adresáre v domovskom adresári zotriedené podľa mena
 --------------------------------------------------------------------
@@ -342,9 +295,11 @@ Vypíšte súbory a adresáre v domovskom adresári zotriedené podľa mena
 Cmdlet `Sort-Object` usporiadava objekty podľa ľubovoľného kritéria. V tomto
 prípade triedi podľa mena.
 
-Skrátený alias:
+<div class="note alias" markdown="1">
+Aliasy `Sort-Object`:
 
-	ls | sort
+* Linuxová skrátka na Windowse: `sort`
+</div>
 
 Vypíšte len súbory zotriedené podľa veľkosti
 --------------------------------------------
@@ -355,21 +310,25 @@ Vypíšte len súbory zotriedené podľa veľkosti
 Cmdlet `Sort-Object` má parameter, v ktorom určíme vlastnosť, podľa ktorého sa
 má triediť. Triedime podľa veľkosti (`length`).
 
-### Alternatívne riešenie: alias `sort`
+<div class="note minified" markdown="1">
 
-	ls -file | sort length
+	gci -file | sort-object length
+
+Parameter `-Property` je pozičný, preto ho možno vynechať.
+</div>
 
 Vypíšte súbory a adresáre zotriedené podľa veľkosti zostupne
 ------------------------------------------------------------
 
 	Get-ChildItem | Sort-Object -Property Length -Descending
 
-Parameter možno skrátiť:
+<div class="note minified" markdown="1">
 
-	ls | sort length –desc
+	gci | sort-object length -desc
 
-Ak sa parameter skráti na `–d`, nastane chyba nejednoznačnosti názvu parametra 
-(pri sorte existujú dva: `-debug` a `–descending`)
+Ak sa parameter skráti na `–d`, nastane chyba nejednoznačnosti názvu parametra,
+pretože existuje `-Debug` a `-Descending`.
+</div>
 
 Nájdite najväčší súbor v domovskom adresári, bez vnárania (`Select-Object`)
 ---------------------------------------------------------------------------
@@ -379,9 +338,15 @@ Nájdite najväčší súbor v domovskom adresári, bez vnárania (`Select-Objec
 	        Select-Object -First 1
 
 Cmdlet `Select-Object` dokáže filtrovať prvých/posledných *n* záznamov, 
-stránkovať a podobne. V našom príklade sme vybrali prvý objekt z rúry, resp. prvý objekt zo zoznamu súborov utriedených podľa veľkosti
+stránkovať a podobne. V našom príklade sme vybrali prvý objekt z rúry, resp.
+prvý objekt zo zoznamu súborov utriedených podľa veľkosti
 
-	ls | sort length -Desc | select -f 1
+<div class="note alias" markdown="1">
+Aliasy `Select-Object`:
+
+* `select`
+
+</div>
 
 Vypíšte plné cesty k všetkým súborom a adresárom v aktuálnom adresári
 ---------------------------------------------------------------------
@@ -420,12 +385,12 @@ Pri výpise adresára cez `Get-ChildItem` sme videli len štyri vlastnosti (`Mod
  preskúmať dostupné vlastnosti objektu v rúre. O tomto cmdlete si povieme neskôr.  
 </div>
 
-Vypíšte len plné cesty k všetkým súborom a adresárom v aktuálnom adresári, bez dekorácie
-----------------------------------------------------------------------------------------
+### Alternatívne riešenie: výpis bez dekorácie
 
 	Get-ChildItem | Select-Object -ExpandProperty FullName
 
-Parameter `-ExpandProperty FullName` zoberie z rúry objekt, pristúpi k vlastnosti uvedenej v parametri, a jej hodnotu pošle do rúry.
+Parameter `-ExpandProperty FullName` zoberie z rúry objekt, pristúpi
+k vlastnosti uvedenej v parametri, a jej hodnotu pošle do rúry.
 
 	C:\Users\novotnyr\Contacts
 	C:\Users\novotnyr\Desktop
@@ -442,9 +407,13 @@ Parameter `-ExpandProperty FullName` zoberie z rúry objekt, pristúpi k vlastno
 
 V tomto prípade pošleme do rúry zoznam reťazcov s plnými názvami súborov.
 
-Alternatívny zápis:
+### Alternatívne riešenie: prístup ku vlastnosti pre všetky objekty v rúre
 
-	ls | select -exp fullname
+	(Get-ChildItem).FullName
+
+Zápis umožňuje získať hodnotu vlastnosti `FullName` na každom objekte
+z rúry. Tento zápis sa správa úplne rovnako ako predošlý variant
+so `Select-Object -ExpandProperty FullName`.
 
 Nájdite plnú cestu a veľkosť najväčšieho súboru v domovskom adresári vrátane podadresárov
 -----------------------------------------------------------------------------------------
@@ -456,9 +425,11 @@ Nájdite plnú cestu a veľkosť najväčšieho súboru v domovskom adresári vr
 Cmdlet `Select-Object` generuje objekty s dvoma vlastnosťami: plnú cestu 
 (`FullName`) a dĺžku (`Length`), a zo zoznamu vyberie len prvý objekt.
 
-Alternatívny zápis:
+<div class="note minified" markdown="1">
 
-	ls -r | sort length -desc | select FullName, Length -first 1
+	gci -r | sort-object length -desc | select fullname, length -f 1
+
+</div>
 
 Nájdite plné cesty k všetkým súborom väčším než 20 MB [`Where-Object`]
 ----------------------------------------------------------------------
@@ -466,9 +437,7 @@ Vypisujme súbory, ktoré majú isté vlastnosti, resp. ktoré spĺňajú danú
 podmienku. Inými slovami, do výstupu pošleme len súbory, ktoré prejdú filtrom.
 Na filtrovanie slúži cmdlet `Where-Object`:
 
-	Get-ChildItem -Recurse | 
-	    Where-Object Length -ge 20MB | 
-	        Select-Object -ExpandProperty FullName
+	(Get-ChildItem -Recurse | Where-Object Length -ge 20MB).FullName
 
 Cmdlet `Get-ChildItem` posiela do rúry objekt za objektom, adresár za adresárom,
 súbor za súborom. Cmdlet `Where-Object` sa postupne pozerá na objekty prichádzajúce
@@ -485,12 +454,6 @@ s obskúrnym názvom.
 
 Powershell umožňuje definovať veľkosti v čitateľnom tvare. Hodnota `20 MB`
 sa automaticky prepočíta na správnu veľkosť `20971520` bajtov.
-
-### Alternatívne riešenie: alias `Where` a `?`
-
-Cmdlet má skrátený zápis cez `Where` alebo cez úplne jednoduchý otáznik:
-
-	ls -r | ? length -ge 20MB | select FullName
 
 
 Nájdite plné cesty k všetkým súborom z roku 2015 [`Where-Object`]
@@ -554,10 +517,9 @@ mohli prehnať cez `Get-Unique`, ktorý vyhodí duplicitné riadky.
 
 Triedenie je potrebné, pretože bez nich `Get-Unique` nebude fungovať správne.
 
-    Get-ChildItem . *.mp3 -Recurse |
-        Select-Object -ExpandProperty DirectoryName |
-            Sort-Object | 
-                Get-Unique
+    (Get-ChildItem . *.mp3 -Recurse).DirectoryName
+        Sort-Object | 
+            Get-Unique
 
 Spočítajte frekvencie prípon súborov v adresári [grouping, `Group-Object`]
 --------------------------------------------------------------------------
@@ -567,6 +529,12 @@ súborov zdieľa spoločné prípony. Zoskupme teda súbory podľa prípony:
 
     Get-ChildItem -Recurse | 
         Group-Object Extension
+
+<div class="note alias" markdown="1">
+Aliasy `Group-Object`:
+
+* Skratka: `group`
+</div>
 
 Výstupom bude:
 
@@ -582,7 +550,3 @@ frekvencie, stačí výsledok zotriediť a vybrať len príslušné vlastnosti:
         Group-Object Extension | 
             Sort-Object Count -Descending | 
                 Select-Object Name, Count
-
-### Alternatívne riešenie -- skrátený zápis
-
-    gci -r | group extension | sort count -desc | select name, count

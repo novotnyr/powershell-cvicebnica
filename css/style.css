@@ -59,6 +59,41 @@ pre {
     padding: 12pt;
 }
 
+.post .note.minified {
+    background: #999999;
+    color: white;
+}
+
+.post .note.minified pre::before {
+    content: "Skrátený zápis:\A";
+    font-family: 'Arimo', sans-serif;
+}
+
+.post .note.minified.windows pre::before {
+    content: "Skrátený zápis (Windows):\A";
+    font-family: 'Arimo', sans-serif;
+}
+
+.post .note.minified pre {
+    background: #999999;
+    color: white;
+    margin-left: 0;
+}
+
+.post .note.alias {
+    float: right;
+    clear: both;
+    margin-left: 22em;
+    width: 20em;
+    background: #999999;
+    color: white;
+    padding-bottom: 12pt;
+}
+.post .note.alias ul {
+    margin-left: 0;
+    margin-top: -16pt; /* compensate for 'p' */
+}
+
 .post-content h1 {
     /* hide H1, as they are repeated in the page title */
     display: none;

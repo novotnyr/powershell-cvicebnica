@@ -113,8 +113,8 @@ Vypočítajte druhú odmocninu z 25
 
 Použime statickú metódu `Sqrt()` na objekte `System.Math`.
 
-Otestujte sieťovú dostupnosť troch serverov z rovnakej domény [`foreach]
-------------------------------------------------------------------------
+Otestujte sieťovú dostupnosť troch serverov z rovnakej domény [`foreach`]
+-------------------------------------------------------------------------
 
     $hosts = "maps", "drive", "hangouts"
     foreach($host in $hosts) {
@@ -226,7 +226,7 @@ tvrdým pretypovaním čísla (*int*) na znak (*char*).
     }
 
 PowerShell 6 podporuje aj znakové intervaly. Necháme si vygenerovať znaky
-od `a` po `z` (teda rúru z 26 znakov), z ktorých následne vyberiem 20 znakov.
+od `a` po `z` (teda rúru z 26 znakov), z ktorých následne vyberieme 20 znakov.
 Celú náhodnú rúru uvedieme do zátvorky,
 aby sme ju mohli považovať za pole dvadsiatich znakov, a následne skonkatenovať
 (spojiť) do jedného reťazca pomocou operátora `-join`.
@@ -274,9 +274,9 @@ Vytvorte funkciu `Get-HomeDirectory`, ktorá pre zadaného používateľa vráti
 ------------------------------------------------------------------------------------------------
 
 	function Get-HomeDirectory($username) {
-	    $account = Get-WmiObject Win32_UserAccount -Filter "name = '$username'"
+	    $account = Get-CimInstance Win32_UserAccount -Filter "name = '$username'"
 	    $sid = account.sid
-	    $profile = Get-WmiObject Win32_UserProfile -Filter "sid = '$sid'"
+	    $profile = Get-CimInstance Win32_UserProfile -Filter "sid = '$sid'"
 	    $profile.LocalPath
 	}
 
@@ -290,7 +290,7 @@ Výpis (na Windows 8.1):
 
 Vo funkcii využijeme:
 
-*   získavanie informácií o používateľovi cez WMI a cmdlet `Get-WmiObject`
+*   získavanie informácií o používateľovi cez WMI a cmdlet `Get-CimInstance`
 *   interpoláciu reťazcov.
 
         "name = '$username'"
@@ -307,9 +307,9 @@ Vytvorte funkciu `Get-HomeDirectory`, ktorá vypíše domovský adresár použí
 
 	function Get-HomeDirectory {
 	    foreach($user in $input) {
-            $account = Get-WmiObject Win32_UserAccount -Filter "name = '$user'"
+            $account = Get-CimInstance Win32_UserAccount -Filter "name = '$user'"
             $sid = account.sid
-            $profile = Get-WmiObject Win32_UserProfile -Filter "sid = '$sid'"
+            $profile = Get-CimInstance Win32_UserProfile -Filter "sid = '$sid'"
             $profile.LocalPath
 	    }
 	}
@@ -324,9 +324,9 @@ Každá funkcia má skrytú premennú `$input`, ktorá je kolekcia s prvkami pri
 
  	function Get-HomeDirectory {
  	    process {
-             $account = Get-WmiObject Win32_UserAccount -Filter "name = '$_'"
+             $account = Get-CimInstance Win32_UserAccount -Filter "name = '$_'"
              $sid = account.sid
-             $profile = Get-WmiObject Win32_UserProfile -Filter "sid = '$sid'"
+             $profile = Get-CimInstance Win32_UserProfile -Filter "sid = '$sid'"
              $profile.LocalPath
  	    }
  	}

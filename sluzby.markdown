@@ -11,18 +11,25 @@ Vypíšte zoznam všetkých služieb vo Windowse
 
 	Get-Service
 
-Alias:
+<div class="note alias" markdown="1">
+Aliasy `Get-Service`:
 
-	gsv
+* Skratka: `gsv`
+
+</div>
 
 Vypíšte zoznam všetkých bežiacich služieb
 -----------------------------------------
 
-	Get-Service | Where-Object Status -eq Running
+	Get-Service | Where-Object Status -eq "Running"
 
 Služba je reprezentovaná objektami typu `System.ServiceProcess.ServiceController`,
 ktoré majú vlastnosť `Status`. Bežiace služby majú hodnotu tejto vlastnosti
 rovnú `Running`.
+
+<div class="note minified" markdown="1">
+	gsv | ? status -match run
+</div>
 
 Zastavte službu s názvom Themes
 -------------------------------
@@ -47,20 +54,16 @@ Zistite, aké atribúty má objekt pre službu
 
 	Get-Service | Get-Member
 
-alebo
-
-	gsv | gm
-
 Vypíšte služby spolu so závislými službami
 ------------------------------------------
 
-	Get-Service | ft Name, ServicesDependedOn –a
+	Get-Service | Select Name, ServicesDependedOn
 
 Vypíšte služby, ktoré nezávisia na žiadnej službe.
 -------------------------------------------
 
 	Get-Service | 
-	    Where-Object { $_.ServicesDependedOn } | 
+	    Where-Object ServicesDependedOn | 
 	        Select Name
 
 Atribút `ServicesDependedOn` je zoznamom. Hoci podmienka vo `Where-Object`
@@ -79,7 +82,8 @@ Pre každú službu vypíšte služby, na ktorých táto služba závisí
 	    Select-Object DisplayName, DependentServices | 
 	        Sort-Object DisplayName
 
-Skrátene:
+<div class="note minified" markdown="1">
+    gsv | sort-object displayname | select displayname, dependentservices
+</div>
 
-    gsv | sort displayname | ft displayname, dependentservices -a        
 

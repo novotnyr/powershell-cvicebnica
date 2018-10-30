@@ -5,9 +5,6 @@ layout: page
 Súbory
 ======
 
-Vytvorte v domovskom adresári súbor `ahoj.txt` s obsahom `AHOJ`
----------------------------------------------------------------
-
 Vytvorte v domovskom adresári súbor `ahoj.txt` s obsahom `AHOJ` [`Set-Content`]
 -------------------------------------------------------------------------------
 Pošlime do rúry reťazec, ktorý zapíšeme do súboru pomocou cmdletu
@@ -15,9 +12,12 @@ Pošlime do rúry reťazec, ktorý zapíšeme do súboru pomocou cmdletu
 
 	"AHOJ" | Set-Content ahoj.txt
 
-Cmdlet `Set-Content` má alias:
+<div class="note alias" markdown="1">
+Aliasy `Set-Content`:
 
-	"AHOJ" | sc ahoj.txt
+* `sc`
+
+</div>
 
 ### Alternatívne riešenie: `echo` a presmerovanie
 
@@ -34,17 +34,13 @@ Vypíšte obsah súboru `ahoj.txt` [`Get-Content`]
 Cmdlet `Get-Content` načíta súbor a každý riadok pošle do rúry. Ak na
 konci rúry nie je žiadny explicitný cmdlet, riadky sa vypíšu do konzoly.
 
-Aliasy:
+<div class="note alias" markdown="1">
+Aliasy `Set-Content`:
 
-	gc ahoj.txt
+* skratka `gc`
+* linuxový alias na Windowse `cat`
 
-Linuxový alias:
-
-	cat ahoj.txt 
-
-Príkaz zo starého shellu Windowsu, ktorý však nemá výhody cmdletov:
-
-	more ahoj.txt 
+</div>
 
 Spočítajte počet riadkov v súbore `ahoj.txt` [`Get-Content`, `Measure-Object`]
 ------------------------------------------------------------------------------
@@ -65,13 +61,17 @@ z rúry.
 
 Spočítajte počet slov vo všetkých textových súboroch v domovskom adresári
 -------------------------------------------------------------------------
-Najprv získame všetky textové súbory. Pre každý takýto súbor
-vyvoláme cmdlet `Get-Content`, čím získame riadky príslušného súboru.
-Všetky riadky sa postupne budú zbierať v meracom nástroji `Measure-Object`,
-ktorý nám zráta slová.
 
     Get-ChildItem ~ *.txt | 
         Get-Content | 
             Measure-Object -Word | 
                 Select-Object -ExpandProperty Words
 
+Najprv získame všetky textové súbory. Pre každý takýto súbor
+vyvoláme cmdlet `Get-Content`, čím získame riadky príslušného súboru.
+Všetky riadky sa postupne budú zbierať v meracom nástroji `Measure-Object`,
+ktorý nám zráta slová.
+
+<div class="note minified" markdown="1">
+    (gci ~ *.txt | gci | measure -w).words
+</div>

@@ -161,20 +161,20 @@ Reštartujte počítač [`Restart-Computer`]
 
 CIM ťahák
 ---------
-Bežná kombinácia `Get-WmiObject` a výberu s filtráciou:
+Bežná kombinácia `Get-CimInstance` a výberu s filtráciou:
 
-	Get-WmiObject Win32_Process |
+	Get-CimInstance Win32_Process |
             Select-Object ProcessId, Name, ExecutablePath |
                 Where-Object Name -eq powershell.exe
 
 Výber pomocou dopytu jazyka *WMI Query Language*:
 
-    Get-WmiObject Win32_Process `
+    Get-CimInstance Win32_Process `
         -Query "SELECT Name FROM Win32_Process WHERE Name = 'powershell.exe'"
 
 Dopytovanie s filtráciou:
 
-    Get-WmiObject Win32_Process -Filter "Name = 'powershell.exe'"
+    Get-CimInstance Win32_Process -Filter "Name = 'powershell.exe'"
 
 Dopytovanie s pretypovaním reťazca na `wmisearcher`:
 
