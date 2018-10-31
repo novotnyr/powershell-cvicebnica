@@ -75,19 +75,17 @@ pre {
 }
 
 .post .note.minified pre {
-    background: #999999;
     color: white;
     margin-left: 0;
+    background: rgb(0, 82, 64);
 }
 
 .post .note.alias {
-    float: right;
-    clear: both;
-    margin-left: 22em;
-    width: 20em;
-    background: #999999;
+    width: 21em;
+    background: rgb(69, 0, 82);
     color: white;
     padding-bottom: 12pt;
+    margin-bottom: 6pt;
 }
 .post .note.alias ul {
     margin-left: 0;

@@ -129,8 +129,8 @@ Vypíšte obsah vlastného domovského adresára
 
 Vlnka `~` je skratka pre cestu do domovského adresára.
 
-Presuňte sa do adresára `C:\Windows` [`Set-Location`
-----------------------------------------------------
+Presuňte sa do adresára `C:\Windows` [`Set-Location`]
+-----------------------------------------------------
 
 	Set-Location C:\Windows
 
@@ -372,11 +372,12 @@ Cmdlet `Select-Object` vie tiež vytiahnuť z každého objektu, ktorý príde z
 	C:\Users\novotnyr\Videos
 
 Pre každý objekt, ktorý príde z rúry, pošle `Select-Object` do rúry nový objekt
- len s tými vlastnosťami, ktoré boli spomenuté v parametri. V príklade pošle cmdlet do výsledku objekty s jedným atribútom `FullName`.
+len s tými vlastnosťami, ktoré boli spomenuté v parametri. V príklade pošle
+cmdlet do výsledku objekty s jedným atribútom `FullName`.
 
-Alias:
-
-	ls | select fullname
+<div class="note minified" markdown="1">
+	gci | select length
+</div>
 
 <div class="note" markdown="1">
 Pri výpise adresára cez `Get-ChildItem` sme videli len štyri vlastnosti (`Mode`,
@@ -431,13 +432,15 @@ Cmdlet `Select-Object` generuje objekty s dvoma vlastnosťami: plnú cestu
 
 </div>
 
-Nájdite plné cesty k všetkým súborom väčším než 20 MB [`Where-Object`]
-----------------------------------------------------------------------
+Nájdite úplné cesty a veľkosti všetkých súborov väčších než 20 MB [`Where-Object`]
+----------------------------------------------------------------------------------
+
+	Get-ChildItem -Recurse | 
+	    Where-Object Length -ge 20MB | 
+	        Select-Object FullName, Length
+
 Vypisujme súbory, ktoré majú isté vlastnosti, resp. ktoré spĺňajú danú
 podmienku. Inými slovami, do výstupu pošleme len súbory, ktoré prejdú filtrom.
-Na filtrovanie slúži cmdlet `Where-Object`:
-
-	(Get-ChildItem -Recurse | Where-Object Length -ge 20MB).FullName
 
 Cmdlet `Get-ChildItem` posiela do rúry objekt za objektom, adresár za adresárom,
 súbor za súborom. Cmdlet `Where-Object` sa postupne pozerá na objekty prichádzajúce
@@ -455,9 +458,18 @@ s obskúrnym názvom.
 Powershell umožňuje definovať veľkosti v čitateľnom tvare. Hodnota `20 MB`
 sa automaticky prepočíta na správnu veľkosť `20971520` bajtov.
 
+<div class="note minified" markdown="1">
+
+	gci -r | ? length -ge 20MB | select fullname, length
+
+</div>
+
 
 Nájdite plné cesty k všetkým súborom z roku 2015 [`Where-Object`]
 -----------------------------------------------------------------
+
+    Get-ChildItem | Where-Object { $_.LastWriteTime.Year -eq 2015 }
+
 Každý súbor má vlastnosť `LastWriteTime`, ktorá obsahuje dátum a čas
 posledného zápisu. Hodnota tejto vlastnosti je tiež objekt (typu `datetime`),
 ktorý má opäť svoje vlastné vlastnosti. (Objekty môžu pozostávať z iných
@@ -478,14 +490,11 @@ a vždy vráti prázdny výsledok!
 Namiesto toho musíme použiť iný zápis podmienky a to v podobe *bloku skriptu*
 (*script block*), ktorý pripomína programovanie v Jave, či C.
 
-    Get-ChildItem | Where-Object { $_.LastWriteTime.Year -eq 2015 }
-
 Cmdlet `Where-Object` vezme objekt prichádzajúci z rúry, dosadí ho
 do špeciálnej premennej `$_` a overí platnosť podmienky.
 
 Premenná `$_` má zvláštny názov, ale jej význam je jednoduchý: reprezentuje
-objekt, ktorého vlastnosť overujeme. Ak nás stále znepokojuje, môžeme
-použiť aj alternatívny názov `$PSItem`.
+objekt, ktorého vlastnosť overujeme.
 
 V príklade overujeme vlastnosť `LastWriteTime.Year`, ktorú porovnávame
 s príslušnou hodnotou.

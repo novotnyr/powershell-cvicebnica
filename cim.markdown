@@ -1,5 +1,5 @@
 ---
-title: Cvičebnica z Powershellu, CIM
+title: Cvičebnica z Powershellu -- CIM
 layout: page
 ---
 

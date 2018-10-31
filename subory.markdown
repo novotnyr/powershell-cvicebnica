@@ -35,7 +35,7 @@ Cmdlet `Get-Content` načíta súbor a každý riadok pošle do rúry. Ak na
 konci rúry nie je žiadny explicitný cmdlet, riadky sa vypíšu do konzoly.
 
 <div class="note alias" markdown="1">
-Aliasy `Set-Content`:
+Aliasy `Get-Content`:
 
 * skratka `gc`
 * linuxový alias na Windowse `cat`
