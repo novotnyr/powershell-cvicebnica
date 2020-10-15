@@ -250,7 +250,7 @@ výraz:
 
     Windows (Server )?\d{2,4}
 
-Vypíšte len roky, keď vyšiel Windows [premenná `$matches`]
+Vypíšte len roky, keď vyšiel Windows [premenná `$Matches`]
 ----------------------------------------------------------
 V tejto úlohe nebudeme len zisťovať, či riadok súboru zodpovedá regulárnemu
 výrazu, ale budeme získavať časti riadka, ktoré vypíšeme.
@@ -286,18 +286,18 @@ K vnoreným hodnotám môžeme pristúpiť aj dvojkombináciou `For-Each`:
 ### Alternatívne riešenie
 
 Powershell dokáže poslať výsledok zhody regulárneho výrazu so vstupom do
-špeciálnej premennej `$matches`, na ktorú sa môžeme odkázať v rúre. Premenná je
+špeciálnej premennej `$Matches`, na ktorú sa môžeme odkázať v rúre. Premenná je
 typu pole, ktoré obsahuje na nultej pozícii podreťazec vyhovujúci regulárnemu
 výrazu.
 
-Rok na každom riadku sa objaví na nultom prvku premennej `$matches`, a
-pristúpime k nemu cez `$matches[0]`.
+Rok na každom riadku sa objaví na nultom prvku premennej `$Matches`, a
+pristúpime k nemu cez `$Matches[0]`.
 
 	Get-Content windows.txt | 
 		Where-Object { $_ -match "^\d{4}" } | 
-			ForEach-Object { $matches[0] }
+			ForEach-Object { $Matches[0] }
 
-Vypíšte len kódové označenia [escape a `$matches`]
+Vypíšte len kódové označenia [escape a `$Matches`]
 --------------------------------------------------
 
 V úlohe sú kódové označenia medzi hranatými zátvorkami. Prvý nápad pre výraz by
@@ -322,9 +322,9 @@ Výsledok však bude obsahovať aj samotné zátvorky.
 
 	Get-Content windows.txt | 
 		Where-Object { $_ -match "\[.*\]" } | 
-			ForEach-Object { $matches[0] }
+			ForEach-Object { $Matches[0] }
 
-Vypíšte len kódové označenia bez zátvoriek [skupiny a `$matches`]
+Vypíšte len kódové označenia bez zátvoriek [skupiny a `$Matches`]
 -----------------------------------------------------------------
 
 Pri výpise kódových označení nechceme vidieť zátvorky. Ak si vnútro medzi
@@ -356,24 +356,24 @@ výraze.
 
     Get-Content windows.txt | 
         Select-String "\[(.*)\]" | 
-            ForEach-Object { $matches[0] }
+            ForEach-Object { $Matches[0] }
 
 ### Alternatívne riešenie
 
 Ak používame `Where-Object` a operátor `-match`, prvá skupina sa objaví
-v premennej `$matches[1]` na prvej pozícii. Nultá skupina, reprezentujúca
-podreťazec, ktorý sa zhodol s regulárnym výrazom, je v premennej `$matches[0]`.
+v premennej `$Matches[1]` na prvej pozícii. Nultá skupina, reprezentujúca
+celý podreťazec, ktorý sa zhodol s regulárnym výrazom, je v premennej `Matches[0]`.
 
 	Get-Content windows.txt | 
 		Where-Object { $_ -match "\[(.*)\]" } | 
-			ForEach-Object { $matches[1] }
+			ForEach-Object { $Matches[1] }
 
-Vypíšte názvy Windowsov a roky vydania (`$matches`)
+Vypíšte názvy Windowsov a roky vydania (`$Matches`)
 ---------------------------------------------------
 
 	Get-Content windows.txt | 
 		Where-Object { $_ -match "([0-9]{4}).*(Windows .*) \[" } | 
-			ForEach-Object { $matches[2] + " (" + $matches[1] + ")"}
+			ForEach-Object { $Matches[2] + " (" + $Matches[1] + ")"}
 
 Vytvoríme regulárny výraz, v ktorom označíme skupiny pre roky a názvy vydaní.
 
@@ -384,7 +384,7 @@ Vytvoríme regulárny výraz, v ktorom označíme skupiny pre roky a názvy vyda
 *	`Windows` a text až po medzeru pred hranatou zátvorkou je názov vydania. Označíme ho ako druhú skupinu
 *	posledný znak `\[` predstavuje explicitnú medzeru
 
-Obe skupiny sa objavia na prvom a druhom prvku v poli `$matches`.
+Obe skupiny sa objavia na prvom a druhom prvku v poli `$Matches`.
 
 Vypíšte názov edície a všetky heštagy (pažravosť operátorov)
 ------------------------------------------------------------
@@ -400,7 +400,7 @@ Toto však fungovať nebude, čo si všimnime na výsledku, kde prvú skupinu (e
 
 	Get-Content windows.txt | 
 		Where-Object { $_ -match "(Windows .*) \[.*(#.*)$" } | 
-			ForEach-Object { $matches[1] + "|" + $matches[2] }
+			ForEach-Object { $Matches[1] + "|" + $Matches[2] }
 
 Výsledok:
 
