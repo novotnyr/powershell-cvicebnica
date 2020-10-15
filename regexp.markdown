@@ -103,7 +103,7 @@ Hrubé riešenie použije bodku `.` ako zástupný symbol pre jeden znak. Použi
 
 Vypíšte systémy vydané v októbri [opakovania]
 ---------------------------------------------
-Opakovanie, kde je jasný presný počet, vyjadríme výrazom v zložených zátvorkách. Výraz `.{4}` znamená "ľubovoľný znak opakovaný štyrikrát".
+Opakovanie, kde je jasný presný počet, vyjadríme výrazom v zložených zátvorkách. Výraz `.{4}` znamená „ľubovoľný znak opakovaný štyrikrát“.
 
 	Get-Content windows.txt | 
 	    Select-String ".{4}-10"
@@ -143,11 +143,11 @@ Vypíšte systémy, ktoré nemali číslo verzie v oficiálnom názve [negácia 
 
 Ak chceme použiť sadu *zakázaných* znakov, v hranatých zátvorkách je na prvom mieste strieška `^`. 
 
-V úlohe stačí vylúčiť čísla a bodku, čo dosiahneme výrazom
+V úlohe stačí vylúčiť čísla a bodku, čo dosiahneme výrazom:
 
 	[^0-9.]
 
-Výraz čítame ako "nie je povolená nula až deviatka a bodka".
+Výraz čítame ako „nie je povolená nula až deviatka a bodka“.
 
 	Get-Content windows.txt | 
 	    Select-String "Windows [^0-9.]"
@@ -155,7 +155,7 @@ Výraz čítame ako "nie je povolená nula až deviatka a bodka".
 V úlohe sú dve nečakané situácie:
 
 *	strieška má v regulárnych výrazoch dva odlišné významy: znamená ukotvenie k začiatku riadku a zároveň reprezentuje negáciu pri sade znakov.
-*	bodka v sade znakov neznamená zástupný symbol pre ľubovoľný znak, ale doslovný znak bodky
+*	bodka v sade znakov neznamená zástupný symbol pre ľubovoľný znak, ale doslovný znak bodky.
 
 ### Alternatívne riešenie [`\d`, `\D`]
 
@@ -163,11 +163,11 @@ Regulárny výraz `[^0-9]` môžeme zapísať skrátením cez:
 
     [^\d]
 
-To reprezentuje sadu znakov "nie cifry". Tento zápis možno ešte skrátiť na:
+To reprezentuje sadu znakov „nie cifry“. Tento zápis možno ešte skrátiť na:
 
     \D
 
-Reprezentuje to "nečíselný znak".
+Reprezentuje to „nečíselný znak“.
 
 	Get-Content windows.txt | 
 	    Select-String "Windows \D"
@@ -199,8 +199,8 @@ reprezentuje cez výraz `.*`.
 	Get-Content windows.txt | 
 	    Select-String "Windows.*[0-9]{2,4}"
 
-Výraz znamená "hľadaj najprv *Windows*, za ním ľubovoľný znak opakovaný nula
-či viakrát a za ním idú dve alebo štyri čísla"
+Výraz znamená „hľadaj najprv *Windows*, za ním ľubovoľný znak opakovaný nula
+či viakrát a za ním idú dve alebo štyri čísla“.
 
 ### Alternatívne riešenie
 
@@ -245,7 +245,7 @@ Zápis `{0,1}` je rovnaký ako `?`:
 
     Windows (Server )?[0-9]{2,4}
 
-Ak využijeme ďalšie skrátenie pre cifry, vieme získať "optimalizovaný"
+Ak využijeme ďalšie skrátenie pre cifry, vieme získať „optimalizovaný“
 výraz:
 
     Windows (Server )?\d{2,4}
@@ -429,7 +429,7 @@ tak najdlhšia možná zhoda pre výraz `(Windows .*) \[.*(#.*)$` a jej pažravo
 
 	\[.*(#.*)$
 
-Od hranatej zátvorky nasleduje ľubovoľný počet znakov po mriežku, čo sa rozbehne po reťazci, "zožerie" prvú mriežku pri `#win`, zožerie druhú mriežku pri `#win-nt` a zhodu ukončí až pri poslednej mriežke v `#server`, kde do skupiny vloží všetko od mriežky po koniec riadka.
+Od hranatej zátvorky nasleduje ľubovoľný počet znakov po mriežku, čo sa rozbehne po reťazci, „zožerie“ prvú mriežku pri `#win`, zožerie druhú mriežku pri `#win-nt` a zhodu ukončí až pri poslednej mriežke v `#server`, kde do skupiny vloží všetko od mriežky po koniec riadka.
 
 Správne riešenie minimalizuje počet všežravých hviezdičiek. Môžeme napríklad využiť hranaté zátvorky obsahujúce kódové označenie Windowsu ako pevný bod:
 
@@ -444,9 +444,9 @@ Rady pre regulárne výrazy
 =========================
 Regulárne výrazy sa ľahko píšu, ale zložito čítajú. Niekoľko rád, ako uľahčiť ich tvorbu:
 
-*	pri tvorbe sa treba zamerať na "pevné body", teda znaky, ktoré sa určite zhodnú. Zvýši sa tým výkon hľadania zhody a zároveň sa ujasní budúcemu čitateľovi orientácia v zápise výrazu.
+*	pri tvorbe sa treba zamerať na „pevné body“, teda znaky, ktoré sa určite zhodnú. Zvýši sa tým výkon hľadania zhody a zároveň sa ujasní budúcemu čitateľovi orientácia v zápise výrazu.
 
 		(Windows .*) \[.*\] (#.*)$
 
 *	namiesto všeobecnej bodky hľadajúcej jeden znak, je lepšie použiť sadu znakov. Namiesto `....` ako štyroch cifier je často lepšie uviesť `[0-9]{4}`
-*	treba dať pozor na pažravosť hviezdičky, čo vedie k prekvapeniam. Výraz, ktorý má hľadať zhodu k prvej mriežke cez `.*#` nefunguje. Namiesto neho obvykle pomáha hľadanie "nemriežky", čiže `[^#]*#`
+*	treba dať pozor na pažravosť hviezdičky, čo vedie k prekvapeniam. Výraz, ktorý má hľadať zhodu k prvej mriežke cez `.*#` nefunguje. Namiesto neho obvykle pomáha hľadanie „nemriežky“, čiže `[^#]*#`
