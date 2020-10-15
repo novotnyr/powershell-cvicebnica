@@ -386,58 +386,84 @@ Vytvoríme regulárny výraz, v ktorom označíme skupiny pre roky a názvy vyda
 
 Obe skupiny sa objavia na prvom a druhom prvku v poli `$Matches`.
 
-Vypíšte názov edície a všetky heštagy (pažravosť operátorov)
+Vypíšte rok vydania a všetky heštagy (pažravosť operátorov)
 ------------------------------------------------------------
-Naivný nápad by vyzeral takto:
+Naivný nápad založený na nesprávnej úvahe by vyzeral takto:
+ 
+    ^(\d{4}).*(#.*)$
 
-	(Windows .*) \[.*(#.*)$
-
-*	hľadáme `Windows` nasledovaný ľubovoľným počtom znakov až po medzeru pred zátvorkou `[`. Ten si vhodne označíme ako skupinu s názvom edície
-*	za zátvorkou `[` nasleduje ľubovoľný počet znakov až po prvú mriežku `#`
-*	za mriežkou `#` nasleduje ľubovoľný počet znakov ľubovoľne veľa krát až do konca riadku (`$`) ktorý si poznačíme do druhej skupiny. Tá bude reprezentovať všetky heštagy
+* hľadáme od začiatku riadku pomocou zobáčika `^`
+* následne do skupiny zachytíme štyri (`4`) cifry (`\d`)
+* potom očakávame ľubovoľný počet znakov po mriežku `.*`
+* počnúc mriežkou `#` očakávame ľubovoľný počet znakov `.*` po koniec riadku `$`. Celý tento zvyšok zachytíme do skupiny.
 
 Toto však fungovať nebude, čo si všimnime na výsledku, kde prvú skupinu (edícia) oddelíme od heštagov v druhej skupine rúrou:
 
 	Get-Content windows.txt | 
-		Where-Object { $_ -match "(Windows .*) \[.*(#.*)$" } | 
+		Where-Object { $_ -match "^(\d{4}).*(#.*)$" } | 
 			ForEach-Object { $Matches[1] + "|" + $Matches[2] }
 
 Výsledok:
 
-	Windows 95|#win
-	Windows 98|#win
-	Windows 2000|#win-nt
-	Windows ME|#win
-	Windows XP|#win-nt
-	Windows Server 2003|#server
-	Windows Vista|#win-nt
-	Windows Server 2008|#server
-	Windows 7|#win-nt
-	Windows Server 2008 R2|#server
-	Windows Server 2012|#server
-	Windows 8|#win-nt
-	Windows 8.1|#win-nt
-	Windows Server 2012 R2|#server
-	Windows 10|#win-nt
-	Windows Server 2016|#server
+    1995|#win
+    1998|#win
+    2000|#win-nt
+    2000|#win
+    2001|#win-nt
+    ...atď...
 
-Všimnime si, že v každom riadku sa zjaví len posledný heštag! Problém je v pažravosti hviezdičky (*greediness*). Regulárne výrazy totiž hľadajú najdlhšiu možno zhodu! Ak máme vstupný text:
+Všimnime si, že v každom riadku sa zjaví len posledný heštag! 
+Problém je v pažravosti hviezdičky (*greediness*). 
+Regulárne výrazy totiž hľadajú najdlhšiu možno zhodu! 
+
+Ak máme vstupný text:
 
 	2003-04-24 Windows Server 2003 [Whistler Server] #win #win-nt #server
 
-tak najdlhšia možná zhoda pre výraz `(Windows .*) \[.*(#.*)$` a jej pažravosť sa prejaví v časti:
+tak najdlhšia možná zhoda pre výraz `^(\d{4}).*(#.*)$` a jej pažravosť sa prejaví v časti:
 
-	\[.*(#.*)$
+	.*(#.*)$
+	
+Od prvej pomlčky za rokom vydania nasleduje ľubovoľný počet znakov po mriežku. Vyhodnocovač regulárnych výrazov sa pažravo rozbehne po reťazci, „zožerie“ prvú mriežku pri `#win`, zožerie druhú mriežku pri `#win-nt` a zhodu ukončí až pri poslednej mriežke v `#server`, kde do skupiny vloží všetko od mriežky po koniec riadka. 
+Inými slovami, výraz `.*` sa nezastaví pri prvej zhode, ale konzumuje, kým to už naozaj nejde ďalej.
 
-Od hranatej zátvorky nasleduje ľubovoľný počet znakov po mriežku, čo sa rozbehne po reťazci, „zožerie“ prvú mriežku pri `#win`, zožerie druhú mriežku pri `#win-nt` a zhodu ukončí až pri poslednej mriežke v `#server`, kde do skupiny vloží všetko od mriežky po koniec riadka.
+Správne riešenie minimalizuje počet všežravých hviezdičiek. 
+Klasický trik nebude hľadať ľubovoľné znaky, ale len tie, ktoré *ne*obsahujú hraničný znak. 
 
-Správne riešenie minimalizuje počet všežravých hviezdičiek. Môžeme napríklad využiť hranaté zátvorky obsahujúce kódové označenie Windowsu ako pevný bod:
+Ak hľadáme výskyt prvej mriežky `#`, výraz bude využívať sadu `[^#]*`, teda „sadu znakov, ktorá neobsahuje mriežku“, opakovanú ľubovoľný počet krát.
 
-	"(Windows .*) \[.*\] (#.*)"
+    ^(\d{4})[^#]*(#.*)$
 
-Iné riešenie používa trik, kde nehľadáme ľubovoľné znaky, ale len tie, ktoré *ne*obsahujú hraničný znak. Ak hľadáma výskyt prvej mriežky `#`, výraz bude využívať sadu `[^#]*`.
+Výsledok bude nasledovná:
 
-	"(Windows .*) \[[^#]* (#.*)"
+	Get-Content windows.txt | 
+		Where-Object { $_ -match "^(\d{4})[^#]*(#.*)" } | 
+			ForEach-Object { $Matches[1] + " " + $Matches[2] }
+
+Vypíšte názov edície a všetky heštagy
+------------------------------------------------------------
+Regulárny výraz vyzerá nasledovne:
+
+	(Windows .*) \[.*\] (#.*)
+
+*	Hľadáme `Windows` nasledovaný ľubovoľným počtom znakov až po medzeru pred zátvorkou `[`. Všetko zachytíme do skupiny s názvom edície.
+*	Za zátvorkou `[` nasleduje ľubovoľný počet znakov až po párovú zátvorku `]`. Keďže hranaté zátvorky majú špeciálny význam, musíme ich *escape*-núť pomocou lomky. 
+*  Za zátvorkou `]` nasleduje jedna medzera. 
+*	Za mriežkou `#` nasleduje ľubovoľný počet znakov ľubovoľne veľa krát až do konca riadku (`$`) ktorý si poznačíme do druhej skupiny. Tá bude reprezentovať všetky heštagy.
+
+Zápis s dvoma skupinami je omnoho efektívnejšie zapísať pomocou `Where-Object` a operátorom `-match`, s využitím premennej `$Matches`:
+
+    Get-Content ./windows.txt | 
+        Where-Object { $_ -match "(Windows .*) \[.*\] (#.*)" } 
+            | ForEach-Object { $Matches[1] + " " + $Matches[2] }
+
+
+### Alternatívne riešenie
+
+Výsledok pomocou cmdletu `Select-String`:
+
+    Select-String "(Windows .*) \[.*\] (#.*)" ./windows.txt | 
+        % { $_.Matches.Groups[1].Value + " " + $_.Matches.Groups[2].Value }
 
 
 Rady pre regulárne výrazy
